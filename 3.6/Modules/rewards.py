@@ -42,8 +42,8 @@ def evaluate_chem_mol(mol):
         ret_val = [
             True,
             320 < mw < 420,
-            2 < clogp < 3,
-            40 < tpsa < 60
+            3 < clogp < 5,
+            80 < tpsa < 110
         ]
     except:
         ret_val = [False] * 4
