@@ -5,6 +5,8 @@ from build_encoding import decode
 import rdkit.Chem.Crippen as Crippen
 import rdkit.Chem.rdMolDescriptors as MolDescriptors
 from rdkit.Chem import Descriptors
+import subprocess
+
 
 
 
@@ -30,15 +32,24 @@ def get_key(fs):
 
 
 
-
+def get_padel(mol_folder_path,file_path):
+    cmd_list = ['java',
+    '-jar',
+    'C:\\Users\\HP\\PaDEL-Descriptor\\PaDEL-Descriptor.jar',
+    '-dir',
+    mol_folder_path,
+    '-2d',
+    '-file',
+    file_path,
+    '-usefilenameasmolname']
+    out = subprocess.Popen(cmd_list, 
+           stdout=subprocess.PIPE, 
+           stderr=subprocess.STDOUT)
 
 # Main function for the evaluation of molecules.
 def evaluate_chem_mol(mol):
     try:
         Chem.GetSSSR(mol)
-        clogp = Crippen.MolLogP(mol)
-        mw = MolDescriptors.CalcExactMolWt(mol)
-        tpsa = Descriptors.TPSA(mol)
         ret_val = [
             True,
             320 < mw < 420,
