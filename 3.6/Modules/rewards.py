@@ -4,8 +4,9 @@ import numpy as np
 from build_encoding import decode
 import rdkit.Chem.Crippen as Crippen
 import rdkit.Chem.rdMolDescriptors as MolDescriptors
-from rdkit.Chem import Descriptors
 import subprocess
+import pickle
+import pandas as pd
 
 
 
@@ -33,45 +34,50 @@ def get_key(fs):
 
 #function to get Padel descriptors and store in a csv file
 def get_padel(mol_folder_path,file_path):
-    cmd_list = ['java',
-    '-jar',
-    'C:\\Users\\HP\\PaDEL-Descriptor\\PaDEL-Descriptor.jar',
-    '-dir',
-    mol_folder_path,
-    '-2d',
-    '-file',
-    file_path,
-    '-usefilenameasmolname']
+    cmd_list = ['java','-jar','C:\\Users\\HP\\PaDEL-Descriptor\\PaDEL-Descriptor.jar','-dir',mol_folder_path,'-2d','-file',file_path,'-usefilenameasmolname']
     out = subprocess.Popen(cmd_list, 
            stdout=subprocess.PIPE, 
            stderr=subprocess.STDOUT)
+    stdout,stderr = out.communicate()
+    print(stdout)
+    print(stderr)
+
 #Function that processes the padel descriptors and predicts the value
 def get_pIC(mol):
     mol_folder_path = "./generated_molecules/"
-    print(ch.MolToMolBlock(m2),file=open(str(mol_folder_path)+'generated.mol','w+'))
+    print(Chem.MolToMolBlock(mol),file=open(str(mol_folder_path)+'generated.mol','w+'))
     file_path = "./generated_molecules/descriptors.csv"
     get_padel(mol_folder_path,file_path)
     X = pd.read_csv(file_path)
+
+    #Removing the columns with zero variance in original data
     with open('./saved_models/drop1.txt','rb') as fp:
         bad_cols = pickle.load(fp)
     X.drop(columns=bad_cols,inplace=True)
     X.drop(columns='Name',inplace=True)
+
+    #Doing StandardScaler() as applied to original data
     with open('./saved_models/scaler.pkl','rb') as fp:
         scaler = pickle.load(fp)
     X2 = scaler.transform(X)
     X = pd.DataFrame(data=X2,columns=X.columns)
     #X.head()
+    #Dropping columns with low correlation with pIC50
     with open('./saved_models/drop2.txt','rb') as fp:
         bad_cols = pickle.load(fp)
     X.drop(columns=bad_cols,inplace=True)
     with open('./saved_models/pca.pkl','rb') as fp:
-    pca = pickle.load(fp)
+        pca = pickle.load(fp)
+    
+    #Applying PCA
     cols = []
     for i in range(pca.n_components):
         cols.append('comp'+str(i+1))
     principalComponents= pca.transform(X)
     X_red = pd.DataFrame(data=principalComponents, columns=cols)
     X_red.head()
+
+    #Using the Random forest Predictor
     with open('./saved_models/predictor.pkl','rb') as fp:
         pp = pickle.load(fp)
     prediction = pp.predict(X_red)
@@ -81,14 +87,14 @@ def get_pIC(mol):
 def evaluate_chem_mol(mol):
     try:
         Chem.GetSSSR(mol)
+        pIC = get_pIC(mol)
+
         ret_val = [
             True,
-            320 < mw < 420,
-            3 < clogp < 5,
-            80 < tpsa < 110
+            pIC-7
         ]
     except:
-        ret_val = [False] * 4
+        ret_val = [False] * 2
 
     return ret_val
 
@@ -108,7 +114,7 @@ def evaluate_mol(fs, epoch, decodings):
         mol = decode(fs, decodings)
         ret_val = evaluate_chem_mol(mol)
     except:
-        ret_val = [False] * 4
+        ret_val = [False] * 2
 
     evaluated_mols[key] = (np.array(ret_val), epoch)
 
