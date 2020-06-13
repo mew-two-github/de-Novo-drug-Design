@@ -31,7 +31,7 @@ def get_key(fs):
                      else 0 for a in fs])
 
 
-
+#function to get Padel descriptors and store in a csv file
 def get_padel(mol_folder_path,file_path):
     cmd_list = ['java',
     '-jar',
@@ -45,6 +45,37 @@ def get_padel(mol_folder_path,file_path):
     out = subprocess.Popen(cmd_list, 
            stdout=subprocess.PIPE, 
            stderr=subprocess.STDOUT)
+#Function that processes the padel descriptors and predicts the value
+def get_pIC(mol):
+    mol_folder_path = "./generated_molecules/"
+    print(ch.MolToMolBlock(m2),file=open(str(mol_folder_path)+'generated.mol','w+'))
+    file_path = "./generated_molecules/descriptors.csv"
+    get_padel(mol_folder_path,file_path)
+    X = pd.read_csv(file_path)
+    with open('./saved_models/drop1.txt','rb') as fp:
+        bad_cols = pickle.load(fp)
+    X.drop(columns=bad_cols,inplace=True)
+    X.drop(columns='Name',inplace=True)
+    with open('./saved_models/scaler.pkl','rb') as fp:
+        scaler = pickle.load(fp)
+    X2 = scaler.transform(X)
+    X = pd.DataFrame(data=X2,columns=X.columns)
+    #X.head()
+    with open('./saved_models/drop2.txt','rb') as fp:
+        bad_cols = pickle.load(fp)
+    X.drop(columns=bad_cols,inplace=True)
+    with open('./saved_models/pca.pkl','rb') as fp:
+    pca = pickle.load(fp)
+    cols = []
+    for i in range(pca.n_components):
+        cols.append('comp'+str(i+1))
+    principalComponents= pca.transform(X)
+    X_red = pd.DataFrame(data=principalComponents, columns=cols)
+    X_red.head()
+    with open('./saved_models/predictor.pkl','rb') as fp:
+        pp = pickle.load(fp)
+    prediction = pp.predict(X_red)
+    return prediction
 
 # Main function for the evaluation of molecules.
 def evaluate_chem_mol(mol):
