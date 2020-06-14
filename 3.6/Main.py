@@ -11,6 +11,7 @@ from training import train
 from rewards import clean_good
 from rdkit import rdBase
 import logging
+import pickle as pkl
 logging.getLogger().setLevel(logging.INFO)
 rdBase.DisableLog('rdApp.error')
 
@@ -30,18 +31,24 @@ def main(fragment_file, lead_file):
     assert len(used_mols)
     encodings, decodings = get_encodings(fragments)
     save_decodings(decodings)
+    with open('./saved_models/decodings.pkl','wb') as fp:
+        pkl.dump(save_decodings,fp)
     logging.info("Saved decodings")
     
     lead_mols = np.asarray(fragment_mols[-len(lead_mols):])[used_mols[-len(lead_mols):]]
 
 
     X = encode_list(lead_mols, encodings)
-
+    print(X.shape)
+    if X.shape[0] == 0:
+        return -1
     logging.info("Building models")
     actor, critic = build_models(X.shape[1:])
 
-    X = clean_good(X, decodings)
-
+    #X = clean_good(X, decodings)
+    print(X.shape)
+    if X.shape[0] == 0:
+        return -1
     logging.info("Training")
     history = train(X, actor, critic, decodings)
     logging.info("Saving")

@@ -39,8 +39,10 @@ def get_padel(mol_folder_path,file_path):
            stdout=subprocess.PIPE, 
            stderr=subprocess.STDOUT)
     stdout,stderr = out.communicate()
-    print(stdout)
-    print(stderr)
+    with open('./Padel.txt','w') as f:
+        f.write(stdout,stderr)
+    #print(stdout)
+    #print(stderr)
 
 #Function that processes the padel descriptors and predicts the value
 def get_pIC(mol):
@@ -59,7 +61,7 @@ def get_pIC(mol):
     #Doing StandardScaler() as applied to original data
     with open('./saved_models/scaler.pkl','rb') as fp:
         scaler = pickle.load(fp)
-    X2 = scaler.transform(X)
+    X2 = scaler.transform(X.astype('float64'))
     X = pd.DataFrame(data=X2,columns=X.columns)
     #X.head()
     #Dropping columns with low correlation with pIC50
@@ -91,7 +93,7 @@ def evaluate_chem_mol(mol):
 
         ret_val = [
             True,
-            pIC-7
+            pIC>8
         ]
     except:
         ret_val = [False] * 2

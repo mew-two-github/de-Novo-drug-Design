@@ -12,7 +12,7 @@ ETA = 0.1
 
 # Generation parameters
 MAX_SWAP = 5
-FEATURES = 4
+FEATURES = 2
 
 
 # Model parameters

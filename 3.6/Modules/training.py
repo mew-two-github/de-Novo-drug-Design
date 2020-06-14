@@ -2,7 +2,7 @@ import numpy as np
 from global_parameters import MAX_SWAP, MAX_FRAGMENTS, GAMMA, BATCH_SIZE, EPOCHS, TIMES, FEATURES
 from rewards import get_init_dist, evaluate_mol, modify_fragment
 import logging
-
+import pickle as pkl
 
 scores = 1. / TIMES
 n_actions = MAX_FRAGMENTS * MAX_SWAP + 1
@@ -14,13 +14,15 @@ def train(X, actor, critic, decodings, out_dir=None):
 
     hist = []
     dist = get_init_dist(X, decodings)
-    m = X.shape[1]
+    np.save('./dist.npy',dist)
+#    m = X.shape[1]
 
 
     # For every epoch
     for e in range(EPOCHS):
 
         # Select random starting "lead" molecules
+        print("Epoch {} starting".format(e))
         rand_n = np.random.randint(0,X.shape[0],BATCH_SIZE)
         batch_mol = X[rand_n].copy()
         r_tot = np.zeros(BATCH_SIZE)
@@ -81,11 +83,12 @@ def train(X, actor, critic, decodings, out_dir=None):
             # If final round
             if t + 1 == TIMES:
                 frs = []
+               # modified_mols = []
                 for i in range(batch_mol.shape[0]):
 
                     # If molecule was modified
                     if not np.all(org_mols[i] == batch_mol[i]):
-
+                        #modified_mols.append([batchmol[i]])
                         fr = evaluate_mol(batch_mol[i], e, decodings)
                         frs.append(fr)
                         rewards[i] += np.sum(fr * dist)
@@ -126,10 +129,10 @@ def train(X, actor, critic, decodings, out_dir=None):
         np.save("History/score-{}.npy".format(e), np.asarray(frs))
 
 
-        hist.append([np.mean(r_tot)] + list(np.mean(frs,0)) + [np.mean(np.sum(frs, 1) == 4)])
+        hist.append([np.mean(r_tot)] + list(np.mean(frs,0)) + [np.mean(np.sum(frs, 1) == 2)])#CHANGED FROM 4 to 2
         print ("Epoch {2} \t Mean score: {0:.3}\t\t Percentage in range: {1},  {3}".format(
             np.mean(r_tot), [round(x,2) for x in np.mean(frs,0)], e,
-            round(np.mean(np.sum(frs, 1) == 4),2)
+            round(np.mean(np.sum(frs, 1) == 2),2)#FIRST FOUR CHANGED TO TWO
         ))
         
 
