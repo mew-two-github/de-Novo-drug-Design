@@ -33,6 +33,7 @@ def main(fragment_file, lead_file):
     save_decodings(decodings)
     with open('./saved_models/decodings.pkl','wb') as fp:
         pkl.dump(save_decodings,fp)
+    
     logging.info("Saved decodings")
     
     lead_mols = np.asarray(fragment_mols[-len(lead_mols):])[used_mols[-len(lead_mols):]]
