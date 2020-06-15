@@ -84,12 +84,16 @@ def train(X, actor, critic, decodings, out_dir=None):
             # If final round
             if t + 1 == TIMES:
                 frs = []
+                print ("Final round of epoch {}".format(e))
                # modified_mols = []
+                print((batch_mol.shape[0]))
                 for i in range(batch_mol.shape[0]):
-
+                    if ((i+1)*100/512)%25==0:
+                        print("Evaluation Comepletion {}%".format(((i+1)*100/512)%25))
                     # If molecule was modified
                     if not np.all(org_mols[i] == batch_mol[i]):
                         #modified_mols.append([batchmol[i]])
+                    
                         fr = evaluate_mol(batch_mol[i], e, decodings)
                         frs.append(fr)
                         rewards[i] += np.sum(fr * dist)
@@ -99,7 +103,7 @@ def train(X, actor, critic, decodings, out_dir=None):
                     else:
                         frs.append([False] * FEATURES)
 
-
+                print("Updating distribution")
                 # Update distribution of rewards
                 dist = 0.5 * dist + 0.5 * (1.0/FEATURES * BATCH_SIZE / (1.0 + np.sum(frs,0)))
 
@@ -132,8 +136,8 @@ def train(X, actor, critic, decodings, out_dir=None):
 
         hist.append([np.mean(r_tot)] + list(np.mean(frs,0)) + [np.mean(np.sum(frs, 1) == 2)])#CHANGED FROM 4 to 2
         print ("Epoch {2} \t Mean score: {0:.3}\t\t Percentage in range: {1},  {3}".format(
-            np.mean(r_tot), [round(x,2) for x in np.mean(frs,0)], e,
-            round(np.mean(np.sum(frs, 1) == 2),2)#FIRST FOUR CHANGED TO TWO
+            np.mean(r_tot), (np.mean(frs,0),2), e,#Removed a round for loop
+            (np.mean(np.sum(frs, 1) == 2))#FIRST FOUR CHANGED TO TWO and removed round
         ))
         
 

@@ -6,6 +6,7 @@ from mol_utils import split_molecule, join_fragments
 from global_parameters import MAX_FRAGMENTS
 import rdkit.Chem as Chem
 import os
+import pickle as pkl
 
 
 
@@ -189,3 +190,14 @@ def read_decodings():
     with open("History/decodings.txt","r") as f:
         d = eval(f.read())
         return dict([(x,Chem.MolFromSmiles(m)) for x,m in d.items()])
+
+
+def save_encodings(encodings):
+    if not os.path.exists("History/"):
+        os.makedirs("History")
+    with open("History/encodings.pkl","wb") as f:
+        pkl.dump(encodings,f)
+def read_encodings():
+    with open("History/encodings.pkl","rb") as f:
+        encodings = pkl.load(f)
+    return encodings

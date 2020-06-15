@@ -5,7 +5,7 @@ import numpy as np
 
 from file_reader import read_file
 from mol_utils import get_fragments
-from build_encoding import get_encodings, encode_molecule, decode_molecule, encode_list, save_decodings
+from build_encoding import get_encodings, encode_molecule, decode_molecule, encode_list, save_decodings, save_encodings, read_decodings, read_encodings
 from models import build_models
 from training import train
 from rewards import clean_good
@@ -29,16 +29,15 @@ def main(fragment_file, lead_file):
     logging.info("Total molecules used: %s", len(used_mols))
     assert len(fragments)
     assert len(used_mols)
-    encodings, decodings = get_encodings(fragments)
-    save_decodings(decodings)
-    with open('./saved_models/decodings.pkl','wb') as fp:
-        pkl.dump(save_decodings,fp)
-    
-    logging.info("Saved decodings")
-    
+    #encodings, decodings = get_encodings(fragments)
+    #save_encodings(encodings)
+    #save_decodings(decodings)
+    #logging.info("Saved decodings")
+
     lead_mols = np.asarray(fragment_mols[-len(lead_mols):])[used_mols[-len(lead_mols):]]
 
-
+    decodings = read_decodings()
+    encodings = read_encodings()
     X = encode_list(lead_mols, encodings)
     print(X.shape)
     if X.shape[0] == 0:
