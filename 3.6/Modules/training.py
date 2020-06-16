@@ -89,7 +89,7 @@ def train(X, actor, critic, decodings, out_dir=None):
                 print((batch_mol.shape[0]))
                 for i in range(batch_mol.shape[0]):
                     if ((i+1)*100/512)%25==0:
-                        print("Evaluation Comepletion {}%".format(((i+1)*100/512)%25))
+                        print("Evaluation Comepletion {}%".format(((i+1)*100/512)))
                     # If molecule was modified
                     if not np.all(org_mols[i] == batch_mol[i]):
                         #modified_mols.append([batchmol[i]])
