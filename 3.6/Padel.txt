@@ -1,3 +1,0 @@
-Descriptor calculation completed in 0.21 secs . Average speed: ? s/mol.
-Descriptor calculation completed in 0.23 secs . Average speed: ? s/mol.
-Descriptor calculation completed in 0.20 secs . Average speed: ? s/mol.

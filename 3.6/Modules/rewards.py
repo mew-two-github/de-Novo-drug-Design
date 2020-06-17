@@ -11,7 +11,7 @@ import pickle
 import pandas as pd
 from collections import OrderedDict
 from time import sleep
-import os
+import os, shutil
 import glob
 
 
@@ -176,23 +176,32 @@ def clean_good(X, decodings):
         evaluate_mol(X[i], -1, decodings).all()]
     return np.asarray(X)
 
+def clean_folder(folder_path):
+    folder = folder_path
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as ex:
+            print('Failed to delete %s. Reason: %s' % (file_path, ex))
 #Bunch evaluation
 def bunch_evaluation(mols):
     folder_path =  "./generated_molecules/"
-    file_path = "./descriptors.csv"    
+    file_path = "./descriptors.csv"
+    
     #Cleaning up the older files
-# =============================================================================
-#     files = glob.glob(folder_path)
-#     for f in files:
-#         os.remove(f)
-# =============================================================================
+    clean_folder(folder_path)
+    
     i = 0
     SSSR =[]
     for mol in mols:
          try:
              Chem.GetSSSR(mol)
-             SSSR.append(True)
              print(Chem.MolToMolBlock((mol)),file=open(str(folder_path)+'generated'+str(i)+'.mol','w'))
+             SSSR.append(True)
          except:
              SSSR.append(False)
          i = i +1
@@ -202,7 +211,7 @@ def bunch_evaluation(mols):
     X = pd.read_csv(file_path)
     #Filling Null Values
     #X.fillna(value=0,inplace=True)
-    X.to_csv('./X.csv',index=False)
+    #X.to_csv('./X.csv',index=False)
     #Sort all molecules in order to avoid mixups
     X.sort_values(by=['Name'],inplace=True)
     print(X['Name'])
@@ -210,7 +219,7 @@ def bunch_evaluation(mols):
     with open('./saved_models/drop1.txt','rb') as fp:
         bad_cols = pickle.load(fp)
     X_step1 = X.drop(columns=bad_cols,inplace=False)
-    X_step1.to_csv('./X_step1.csv',index=False)
+    #X_step1.to_csv('./X_step1.csv',index=False)
     X_step2 = X_step1.drop(columns='Name',inplace=False)
     
 
@@ -220,7 +229,7 @@ def bunch_evaluation(mols):
         scaler = pickle.load(fp)
     X2 = scaler.transform(X_step2.astype('float64'))
     X_step3 = pd.DataFrame(data=X2,columns=X_step2.columns)
-    X_step3.to_csv('./X_step3.csv',index=False)
+    #X_step3.to_csv('./X_step3.csv',index=False)
     #X.head()
     #Dropping columns with low correlation with pIC50
     with open('./saved_models/drop2.txt','rb') as fp:
@@ -244,6 +253,7 @@ def bunch_evaluation(mols):
         pp = pickle.load(fp)
     predictions = pp.predict(X_red)
     
+    print('Properties predicted for {} molecules'.format(len(predictions)))
     
     Evaluations = []
     j  = 0
@@ -255,7 +265,7 @@ def bunch_evaluation(mols):
             j = j + 1
         else:
             Evaluations.append([False]*2)
-   # print(' Evaluations',Evaluations)
+    print(' Evaluations completed')
     return Evaluations
     
     #print(prediction.shape)
@@ -293,7 +303,7 @@ def bunch_eval(fs, epoch, decodings):
         Evaluations = bunch_evaluation(to_evaluate)
         i = 0
         for value in Evaluations:
-            for key in od.keys:
+            for key in od.keys():
                 if od[key] == i:
                     od[key] = value
                     evaluated_mols[key] = (np.array(value),epoch)
@@ -301,6 +311,7 @@ def bunch_eval(fs, epoch, decodings):
     
     for key in keys:
         ret_vals.append(od[key])
+    print('Length of return values {}'.format(len(ret_vals)))
     return np.array(ret_vals)
 
 # =============================================================================

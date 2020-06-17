@@ -146,7 +146,7 @@ def train(X, actor, critic, decodings, out_dir=None):
 
             r_tot += rewards[:,0]
 
-        np.save("Loss in epoch {}".format(e),loss)
+        np.save("./Losses/Loss in epoch {}".format(e),loss)
         np.save("History/in-{}.npy".format(e), org_mols)
         np.save("History/out-{}.npy".format(e), batch_mol)
         np.save("History/score-{}.npy".format(e), np.asarray(frs))
