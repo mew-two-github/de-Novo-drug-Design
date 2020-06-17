@@ -9,7 +9,10 @@ from build_encoding import decode
 import subprocess
 import pickle
 import pandas as pd
-
+from collections import OrderedDict
+from time import sleep
+import os
+import glob
 
 
 
@@ -37,8 +40,8 @@ def get_key(fs):
 #function to get Padel descriptors and store in a csv file
 def get_padel(mol_folder_path,file_path):
     Padel_path = 'C:\\Users\\HP\\PaDEL-Descriptor\\PaDEL-Descriptor.jar'
-    max_time = '3000' #in milliseconds
-    cmd_list = ['java','-jar',Padel_path, '-dir', mol_folder_path, '-2d','-file', file_path,'-maxruntime', max_time]
+    #max_time = '-1' #in milliseconds
+    cmd_list = ['java','-jar',Padel_path, '-dir', mol_folder_path, '-2d','-file', file_path]#,'-maxruntime', max_time]
     out = subprocess.Popen(cmd_list, 
            stdout=subprocess.PIPE, 
            stderr=subprocess.STDOUT)
@@ -51,6 +54,10 @@ def get_padel(mol_folder_path,file_path):
 #Function that processes the padel descriptors and predicts the value
 def get_pIC(mol):
     mol_folder_path = "./generated_molecules/"
+    #Cleaning up the older files
+    files = glob.glob(mol_folder_path)
+    for f in files:
+        os.remove(f)
     #Generating PaDEL descriptors using get_padel
     
     print(Chem.MolToMolBlock((mol)),file=open(str(mol_folder_path)+'generated.mol','w'))
@@ -169,7 +176,132 @@ def clean_good(X, decodings):
         evaluate_mol(X[i], -1, decodings).all()]
     return np.asarray(X)
 
+#Bunch evaluation
+def bunch_evaluation(mols):
+    folder_path =  "./generated_molecules/"
+    file_path = "./descriptors.csv"    
+    #Cleaning up the older files
+# =============================================================================
+#     files = glob.glob(folder_path)
+#     for f in files:
+#         os.remove(f)
+# =============================================================================
+    i = 0
+    SSSR =[]
+    for mol in mols:
+         try:
+             Chem.GetSSSR(mol)
+             SSSR.append(True)
+             print(Chem.MolToMolBlock((mol)),file=open(str(folder_path)+'generated'+str(i)+'.mol','w'))
+         except:
+             SSSR.append(False)
+         i = i +1
+    get_padel(folder_path,file_path)
+    sleep(5)
+      #Reading the descriptors
+    X = pd.read_csv(file_path)
+    #Filling Null Values
+    #X.fillna(value=0,inplace=True)
+    X.to_csv('./X.csv',index=False)
+    #Sort all molecules in order to avoid mixups
+    X.sort_values(by=['Name'],inplace=True)
+    print(X['Name'])
+    #Removing the columns with zero variance in original data
+    with open('./saved_models/drop1.txt','rb') as fp:
+        bad_cols = pickle.load(fp)
+    X_step1 = X.drop(columns=bad_cols,inplace=False)
+    X_step1.to_csv('./X_step1.csv',index=False)
+    X_step2 = X_step1.drop(columns='Name',inplace=False)
+    
 
+    
+    #Doing StandardScaler() as applied to original data
+    with open('./saved_models/scaler.pkl','rb') as fp:
+        scaler = pickle.load(fp)
+    X2 = scaler.transform(X_step2.astype('float64'))
+    X_step3 = pd.DataFrame(data=X2,columns=X_step2.columns)
+    X_step3.to_csv('./X_step3.csv',index=False)
+    #X.head()
+    #Dropping columns with low correlation with pIC50
+    with open('./saved_models/drop2.txt','rb') as fp:
+        bad_cols = pickle.load(fp)
+    X_step3.drop(columns=bad_cols,inplace=True)
+    
+
+    #Applying PCA
+    #np.where(x.values >= np.finfo(np.float64).max)
+    with open('./saved_models/pca.pkl','rb') as fp:
+        pca = pickle.load(fp)
+    cols = []
+    for i in range(pca.n_components):
+        cols.append('comp'+str(i+1))    
+    principalComponents= pca.transform(X_step3)
+    X_red = pd.DataFrame(data=principalComponents, columns=cols)
+    X_red.to_csv('./X_red.csv',index=False)
+
+    #Using the Random forest Predictor
+    with open('./saved_models/predictor.pkl','rb') as fp:
+        pp = pickle.load(fp)
+    predictions = pp.predict(X_red)
+    
+    
+    Evaluations = []
+    j  = 0
+    for i in range(len(SSSR)):
+
+        if SSSR[i] == True:    
+            pIC = predictions[j]
+            Evaluations.append([SSSR[i],(pIC-7)/3])
+            j = j + 1
+        else:
+            Evaluations.append([False]*2)
+   # print(' Evaluations',Evaluations)
+    return Evaluations
+    
+    #print(prediction.shape)
+    
+    
+         
+def bunch_eval(fs, epoch, decodings):
+
+    global evaluated_mols
+    keys = []
+    od = OrderedDict()
+    total_molecules = len(fs)
+    print("Evaluating totally {} molecules".format(total_molecules))
+    for f in fs:
+        key = get_key(f)
+        keys.append(key)
+        od[key] = np.array([False,False])
+    #print(len(od))
+    to_evaluate = []
+    i = 0
+    for key in keys:
+        if key in evaluated_mols:
+            od[key] = evaluated_mols[key][0]
+        else:
+            try:
+                mol = decode(fs[i], decodings)
+                od[key] = len(to_evaluate)
+                to_evaluate.append(mol)
+               # evaluated_mols[key] = (np.array(ret_val), epoch)
+            except:
+                od[key] = [False] * 2
+        i = i + 1
+    print('New molecules for evaluation: {}'.format(len(to_evaluate)))
+    if len(to_evaluate)!=0:
+        Evaluations = bunch_evaluation(to_evaluate)
+        i = 0
+        for value in Evaluations:
+            for key in od.keys:
+                if od[key] == i:
+                    od[key] = value
+                    evaluated_mols[key] = (np.array(value),epoch)
+    ret_vals = []
+    
+    for key in keys:
+        ret_vals.append(od[key])
+    return np.array(ret_vals)
 
 # =============================================================================
 # df = pd.read_csv('./out.csv',engine="python")
@@ -179,4 +311,3 @@ def clean_good(X, decodings):
 #     mol2 = Chem.MolFromSmiles(df.iloc[i,1])
 #     print(get_pIC(mol1),get_pIC(mol2))
 # =============================================================================
-

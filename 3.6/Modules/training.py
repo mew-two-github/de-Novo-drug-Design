@@ -1,6 +1,6 @@
 import numpy as np
 from global_parameters import MAX_SWAP, MAX_FRAGMENTS, GAMMA, BATCH_SIZE, EPOCHS, TIMES, FEATURES
-from rewards import get_init_dist, evaluate_mol, modify_fragment
+from rewards import get_init_dist, evaluate_mol, modify_fragment, bunch_eval
 import logging
 import pickle as pkl
 
@@ -85,23 +85,41 @@ def train(X, actor, critic, decodings, out_dir=None):
             if t + 1 == TIMES:
                 frs = []
                 print ("Final round of epoch {}".format(e))
-               # modified_mols = []
+                modified_mols = []
                 print((batch_mol.shape[0]))
                 for i in range(batch_mol.shape[0]):
-                    if ((i+1)*100/512)%25==0:
-                        print("Evaluation Comepletion {}%".format(((i+1)*100/512)))
+# =============================================================================
+#                     if ((i+1)*100/512)%25==0:
+#                         print("Evaluation Comepletion {}%".format(((i+1)*100/512)))
+# =============================================================================
                     # If molecule was modified
                     if not np.all(org_mols[i] == batch_mol[i]):
-                        #modified_mols.append([batchmol[i]])
-                    
-                        fr = evaluate_mol(batch_mol[i], e, decodings)
-                        frs.append(fr)
-                        rewards[i] += np.sum(fr * dist)
+                        modified_mols.append([batch_mol[i],i])
+                        # fr = evaluate_mol(batch_mol[i], e, decodings)
+                        # frs.append(fr)
+                        # rewards[i] += np.sum(fr * dist)
 
-                        if all(fr):
-                            rewards[i] *= 2
+                        #if all(fr):
+                            #rewards[i] *= 2
                     else:
                         frs.append([False] * FEATURES)
+                        
+                
+                #Storing all modified molecules
+                molecules = []
+                for i in range(len(modified_mols)):
+                    molecules.append(modified_mols[i][0])
+                
+               # print(len(molecules),molecules[0])
+                    
+                #Evaluating multiple molecules at the same time
+                evaluation = bunch_eval(molecules,e,decodings)
+                
+                #Updating Rewards
+                for i in range(len(modified_mols)):
+                    fr = evaluation[i]
+                    frs.append(fr)
+                    rewards[modified_mols[i][1]] += np.sum(fr*dist)
 
                 print("Updating distribution")
                 # Update distribution of rewards
@@ -128,7 +146,7 @@ def train(X, actor, critic, decodings, out_dir=None):
 
             r_tot += rewards[:,0]
 
-
+        np.save("Loss in epoch {}".format(e),loss)
         np.save("History/in-{}.npy".format(e), org_mols)
         np.save("History/out-{}.npy".format(e), batch_mol)
         np.save("History/score-{}.npy".format(e), np.asarray(frs))
