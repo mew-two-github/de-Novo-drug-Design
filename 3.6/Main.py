@@ -33,9 +33,7 @@ def main(fragment_file, lead_file):
     save_encodings(encodings)
     save_decodings(decodings)
     logging.info("Saved encodings and decodings")
-
     lead_mols = np.asarray(fragment_mols[-len(lead_mols):])[used_mols[-len(lead_mols):]]
-
 # =============================================================================
 #     decodings = read_decodings()
 #     encodings = read_encodings()
