@@ -152,7 +152,8 @@ def get_reward(fs,epoch,dist):
 # Get initial distribution of rewards among lead molecules
 def get_init_dist(X, decodings):
 
-    arr = np.asarray([evaluate_mol(X[i], -1, decodings) for i in range(X.shape[0])])
+    #arr = np.asarray([evaluate_mol(X[i], -1, decodings) for i in range(X.shape[0])])
+    arr = np.asarray(bunch_eval(X,-1,decodings))
     dist = arr.shape[0] / (1.0 + arr.sum(0))
     return dist
 
@@ -264,9 +265,12 @@ def bunch_eval(fs, epoch, decodings):
     #print(len(od))
     to_evaluate = []
     i = 0
+    unused = keys.copy()
     for key in keys:
         if key in evaluated_mols:
             od[key] = evaluated_mols[key][0]
+            while key in unused:
+                unused.remove(key)
         else:
             try:
                 mol = decode(fs[i], decodings)
@@ -281,7 +285,7 @@ def bunch_eval(fs, epoch, decodings):
         Evaluations = bunch_evaluation(to_evaluate)
         print("Length of Evaluations {}".format(len(Evaluations)))
         for i in range(len(Evaluations)):
-            for key in od.keys():
+            for key in unused:
                 if od[key] == i:
                     value = Evaluations[i]
                     od[key] = value
