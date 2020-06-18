@@ -40,8 +40,8 @@ def get_key(fs):
 #function to get Padel descriptors and store in a csv file
 def get_padel(mol_folder_path,file_path):
     Padel_path = 'C:\\Users\\HP\\PaDEL-Descriptor\\PaDEL-Descriptor.jar'
-    #max_time = '-1' #in milliseconds
-    cmd_list = ['java','-jar',Padel_path, '-dir', mol_folder_path, '-2d','-file', file_path]#,'-maxruntime', max_time]
+    max_time = '5000' #in milliseconds
+    cmd_list = ['java','-jar',Padel_path, '-dir', mol_folder_path, '-2d','-file', file_path,'-maxruntime', max_time,"-descriptortypes", 'fd.xml','-usefilenameasmolname']
     out = subprocess.Popen(cmd_list, 
            stdout=subprocess.PIPE, 
            stderr=subprocess.STDOUT)
@@ -68,48 +68,35 @@ def get_pIC(mol):
     #Filling Null Values
     X.fillna(value=0,inplace=True)
     #Removing the columns with zero variance in original data
-    with open('./saved_models/drop1.txt','rb') as fp:
+    with open('./saved_models/drop.txt','rb') as fp:
         bad_cols = pickle.load(fp)
     X_step1 = X.drop(columns=bad_cols,inplace=False)
-    X_step2 = X_step1.drop(columns='Name',inplace=False)
+    X_step2 = X_step1
     
-
+    
     
     #Doing StandardScaler() as applied to original data
-    with open('./saved_models/scaler.pkl','rb') as fp:
+    with open('./saved_models/new_scaler.pkl','rb') as fp:
         scaler = pickle.load(fp)
     X2 = scaler.transform(X_step2.astype('float64'))
     X_step3 = pd.DataFrame(data=X2,columns=X_step2.columns)
     
     #X.head()
     #Dropping columns with low correlation with pIC50
-    with open('./saved_models/drop2.txt','rb') as fp:
-        bad_cols = pickle.load(fp)
-    X_step3.drop(columns=bad_cols,inplace=True)
     
-# =============================================================================
-#     X.to_csv('./X.csv',index=False)
-#     X_step1.to_csv('./X_step1.csv')
-#     X_step2.to_csv('./X_step2.csv')
-#     X_step3.to_csv('./X_step3.csv')
-# =============================================================================
+    # =============================================================================
+    #     X.to_csv('./X.csv',index=False)
+    #     X_step1.to_csv('./X_step1.csv')
+    #     X_step2.to_csv('./X_step2.csv')
+    #     X_step3.to_csv('./X_step3.csv')
+    # =============================================================================
     
-    #X.fillna(value=0)
-    #Applying PCA
-    #np.where(x.values >= np.finfo(np.float64).max)
-    with open('./saved_models/pca.pkl','rb') as fp:
-        pca = pickle.load(fp)
-    cols = []
-    for i in range(pca.n_components):
-        cols.append('comp'+str(i+1))    
-    principalComponents= pca.transform(X_step3)
-    X_red = pd.DataFrame(data=principalComponents, columns=cols)
     
-
+    
     #Using the Random forest Predictor
-    with open('./saved_models/predictor.pkl','rb') as fp:
+    with open('./saved_models/new_RFR.pkl','rb') as fp:
         pp = pickle.load(fp)
-    prediction = pp.predict(X_red)
+    prediction = pp.predict(X_step3)
     #print(prediction.shape)
     return prediction.item(0)
 
@@ -210,48 +197,39 @@ def bunch_evaluation(mols):
       #Reading the descriptors
     X = pd.read_csv(file_path)
     #Filling Null Values
-    #X.fillna(value=0,inplace=True)
-    #X.to_csv('./X.csv',index=False)
-    #Sort all molecules in order to avoid mixups
-    X.sort_values(by=['Name'],inplace=True)
-    print(X['Name'])
+    X.fillna(value=0,inplace=True)
+    X.sort_values(by='Name',inplace=True)
+    X.to_csv('./try.csv',index=False)
     #Removing the columns with zero variance in original data
-    with open('./saved_models/drop1.txt','rb') as fp:
+    with open('./saved_models/drop.txt','rb') as fp:
         bad_cols = pickle.load(fp)
     X_step1 = X.drop(columns=bad_cols,inplace=False)
-    #X_step1.to_csv('./X_step1.csv',index=False)
-    X_step2 = X_step1.drop(columns='Name',inplace=False)
+    X_step2 = X_step1
     
-
+    
     
     #Doing StandardScaler() as applied to original data
-    with open('./saved_models/scaler.pkl','rb') as fp:
+    with open('./saved_models/new_scaler.pkl','rb') as fp:
         scaler = pickle.load(fp)
     X2 = scaler.transform(X_step2.astype('float64'))
     X_step3 = pd.DataFrame(data=X2,columns=X_step2.columns)
-    #X_step3.to_csv('./X_step3.csv',index=False)
+    
     #X.head()
     #Dropping columns with low correlation with pIC50
-    with open('./saved_models/drop2.txt','rb') as fp:
-        bad_cols = pickle.load(fp)
-    X_step3.drop(columns=bad_cols,inplace=True)
     
-
-    #Applying PCA
-    #np.where(x.values >= np.finfo(np.float64).max)
-    with open('./saved_models/pca.pkl','rb') as fp:
-        pca = pickle.load(fp)
-    cols = []
-    for i in range(pca.n_components):
-        cols.append('comp'+str(i+1))    
-    principalComponents= pca.transform(X_step3)
-    X_red = pd.DataFrame(data=principalComponents, columns=cols)
-    X_red.to_csv('./X_red.csv',index=False)
-
+    # =============================================================================
+    #     X.to_csv('./X.csv',index=False)
+    #     X_step1.to_csv('./X_step1.csv')
+    #     X_step2.to_csv('./X_step2.csv')
+    #     X_step3.to_csv('./X_step3.csv')
+    # =============================================================================
+    
+    
+    
     #Using the Random forest Predictor
-    with open('./saved_models/predictor.pkl','rb') as fp:
+    with open('./saved_models/new_RFR.pkl','rb') as fp:
         pp = pickle.load(fp)
-    predictions = pp.predict(X_red)
+    predictions = pp.predict(X_step3)
     
     print('Properties predicted for {} molecules'.format(len(predictions)))
     
@@ -282,7 +260,7 @@ def bunch_eval(fs, epoch, decodings):
     for f in fs:
         key = get_key(f)
         keys.append(key)
-        od[key] = np.array([False,False])
+        od[key] = ([False,False])
     #print(len(od))
     to_evaluate = []
     i = 0
@@ -301,18 +279,21 @@ def bunch_eval(fs, epoch, decodings):
     print('New molecules for evaluation: {}'.format(len(to_evaluate)))
     if len(to_evaluate)!=0:
         Evaluations = bunch_evaluation(to_evaluate)
-        i = 0
-        for value in Evaluations:
+        print("Length of Evaluations {}".format(len(Evaluations)))
+        for i in range(len(Evaluations)):
             for key in od.keys():
                 if od[key] == i:
+                    value = Evaluations[i]
                     od[key] = value
                     evaluated_mols[key] = (np.array(value),epoch)
     ret_vals = []
-    
+    with open('./ret_vals.pkl','wb') as f:
+        pickle.dump(ret_vals,f)
     for key in keys:
-        ret_vals.append(od[key])
-    print('Length of return values {}'.format(len(ret_vals)))
-    return np.array(ret_vals)
+        ret_vals.append(np.asarray(od[key]))
+    ret_vals = np.asarray(ret_vals)
+    print('Shape of return values {}'.format(ret_vals.shape))
+    return (ret_vals)
 
 # =============================================================================
 # df = pd.read_csv('./out.csv',engine="python")

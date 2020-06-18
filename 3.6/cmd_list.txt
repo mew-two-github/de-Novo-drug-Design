@@ -1,0 +1,1 @@
+cmd_list = ["java", "-jar", "C:\\Users\\HP\\PaDEL-Descriptor\\PaDEL-Descriptor.jar", "-dir","./mol", "-file","./trial.csv", "-2d", "-descriptortypes", 'fd.xml','-usefilenameasmolname']

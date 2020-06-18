@@ -29,15 +29,17 @@ def main(fragment_file, lead_file):
     logging.info("Total molecules used: %s", len(used_mols))
     assert len(fragments)
     assert len(used_mols)
-    #encodings, decodings = get_encodings(fragments)
-    #save_encodings(encodings)
-    #save_decodings(decodings)
-    #logging.info("Saved decodings")
+    encodings, decodings = get_encodings(fragments)
+    save_encodings(encodings)
+    save_decodings(decodings)
+    logging.info("Saved encodings and decodings")
 
     lead_mols = np.asarray(fragment_mols[-len(lead_mols):])[used_mols[-len(lead_mols):]]
 
-    decodings = read_decodings()
-    encodings = read_encodings()
+# =============================================================================
+#     decodings = read_decodings()
+#     encodings = read_encodings()
+# =============================================================================
     X = encode_list(lead_mols, encodings)
     print(X.shape)
     if X.shape[0] == 0:

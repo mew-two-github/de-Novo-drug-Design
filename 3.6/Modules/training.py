@@ -114,7 +114,9 @@ def train(X, actor, critic, decodings, out_dir=None):
                     
                 #Evaluating multiple molecules at the same time
                 evaluation = bunch_eval(molecules,e,decodings)
-                
+                with open('./evaluation.pkl','wb') as f:
+                    pkl.dump(evaluation,f)
+                print("Shape of returned evaluations:{}".format(evaluation.shape))
                 #Updating Rewards
                 for i in range(len(modified_mols)):
                     fr = evaluation[i]
