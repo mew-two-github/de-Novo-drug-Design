@@ -13,9 +13,11 @@ n_actions = MAX_FRAGMENTS * MAX_SWAP + 1
 def train(X, actor, critic, decodings, out_dir=None):
 
     hist = []
-    dist = get_init_dist(X, decodings)
-    np.save('./dist.npy',dist)
-    #dist = np.load('./dist.npy')
+# =============================================================================
+#     dist = get_init_dist(X, decodings)
+#     np.save('./dist.npy',dist)
+# =============================================================================
+    dist = np.load('./dist.npy')
 #    m = X.shape[1]
 
 
