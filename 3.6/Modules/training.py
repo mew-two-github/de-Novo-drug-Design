@@ -24,30 +24,33 @@ def train(X, actor, critic, decodings, out_dir=None):
     # For every epoch
     for e in range(EPOCHS):
 
-        # Select random starting "lead" molecules
+        # Select random starting "lead" molecules; number of molecules = BATCH_SIZE; they are sampled from the lead molecules set
         print("Epoch {} starting".format(e))
         rand_n = np.random.randint(0,X.shape[0],BATCH_SIZE)
+        #Taking 512 random molecules from the lead set
         batch_mol = X[rand_n].copy()
+        #1*512(maybe 512x1) zero vector
         r_tot = np.zeros(BATCH_SIZE)
-        org_mols = batch_mol.copy()
+        org_mols = batch_mol.copy() #saving a copy of the original molecules
         stopped = np.zeros(BATCH_SIZE) != 0
 
 
         # For all modification steps
         for t in range(TIMES):
 
-
+            #for each mol, a no. between 0-1 indicating the time-step
             tm = (np.ones((BATCH_SIZE,1)) * t) / TIMES
-
+            #predictions for all the 512 molecules: 512*n_actions
             probs = actor.predict([batch_mol, tm])
             actions = np.zeros((BATCH_SIZE))
+            #Random numbers between 0 and 1
             rand_select = np.random.rand(BATCH_SIZE)
             old_batch = batch_mol.copy()
             rewards = np.zeros((BATCH_SIZE,1))
 
 
             # Find probabilities for modification actions
-            for i in range(BATCH_SIZE):
+            for i in range(BATCH_SIZE):#for every molecules in the batch
 
                 a = 0
                 while True:
@@ -55,10 +58,10 @@ def train(X, actor, critic, decodings, out_dir=None):
                     if rand_select[i] < 0 or a + 1 == n_actions:
                         break
                     a += 1
-
+                #Collecting number of significant actions?
                 actions[i] = a
 
-            # Initial critic value
+            # Initial critic value(predicts the optimal state value)
             Vs = critic.predict([batch_mol,tm])
 
 
@@ -69,19 +72,22 @@ def train(X, actor, critic, decodings, out_dir=None):
                 if stopped[i] or a == n_actions - 1:
                     stopped[i] = True
                     if t == 0:
-                        rewards[i] += -1.
+                        rewards[i] += -1. #Why?
 
                     continue
 
 
+                #Converting the n_actions*1 position to the actual position    
+                a = int(a // MAX_SWAP)#Integer Division, to get the location of the fragment
 
-                a = int(a // MAX_SWAP)
+                s = a % MAX_SWAP# it is the location where the swap happens in that fragment
+                if batch_mol[i,a,0] == 1:#Checking whether the fragment is non-empty?
+                    
+                    #In ith molecule, in its ath fragment, the sth position is flipped
 
-                s = a % MAX_SWAP
-                if batch_mol[i,a,0] == 1:
-                    batch_mol[i,a] = modify_fragment(batch_mol[i,a], s)
+                    batch_mol[i,a] = modify_fragment(batch_mol[i,a], s)#changes 0 to 1 and 1 to 0
                 else:
-                    rewards[i] -= 0.1
+                    rewards[i] -= 0.1   #why 0.1?
 
             # If final round
             if t + 1 == TIMES:
@@ -142,8 +148,8 @@ def train(X, actor, critic, decodings, out_dir=None):
             for i in range(BATCH_SIZE):
 
                 a = int(actions[i])
-                loss = -np.log(probs[i,a]) * td_error[i]
-                target_actor[i,a] = td_error[i]
+                loss = -np.log(probs[i,a]) * td_error[i] #looks same as models.maximisation()
+                target_actor[i,a] = td_error[i]#why is td_error the actor's target?
 
             # Maximize expected reward.
             actor.fit([old_batch,tm], target_actor, verbose=0)
@@ -151,6 +157,7 @@ def train(X, actor, critic, decodings, out_dir=None):
             r_tot += rewards[:,0]
 
         np.save("./Losses/Loss in epoch {}".format(e),loss)
+        np.save("./r_tot",r_tot)
         np.save("History/in-{}.npy".format(e), org_mols)
         np.save("History/out-{}.npy".format(e), batch_mol)
         np.save("History/score-{}.npy".format(e), np.asarray(frs))

@@ -42,9 +42,11 @@ def build_models(inp_shape):
     inp2 = Input((1,))
     hidden = Concatenate()([hidden, hidden2, inp2])
 
+    #Reducing the number of cells(lol, forgot the exact term)
     hidden = LeakyReLU(0.1)(Dense(N_DENSE2, activation="linear")(hidden))
     out = Dense(n_actions, activation="softmax", activity_regularizer=l2(0.001))(hidden)
 
+    #takes molecules as inputs along with a 1-D array which has the time identity
     actor = Model([inp,inp2], out)
     actor.compile(loss=maximization, optimizer=Adam(0.0005))
 
@@ -54,7 +56,7 @@ def build_models(inp_shape):
     hidden = LeakyReLU(0.1)(TimeDistributed(Dense(N_DENSE, activation="linear"))(inp))
     hidden = Bidirectional(LSTM(2*N_LSTM))(hidden)
 
-    inp2 = Input((1,))
+    inp2 = Input((1,))#time step of the molecule?
     hidden = Concatenate()([hidden, inp2])
     hidden = LeakyReLU(0.1)(Dense(N_DENSE2, activation="linear")(hidden))
     out = Dense(1, activation="linear")(hidden)

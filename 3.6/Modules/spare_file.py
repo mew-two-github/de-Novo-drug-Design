@@ -1,7 +1,7 @@
-from collections import OrderedDict
+""" from collections import OrderedDict
 od = OrderedDict()
 od.update({'a':1,'b':2})
-print([key for key in od.keys()])
+print([key for key in od.keys()]) """
 # =============================================================================
 # a = ['abc',2]
 # b = ['defg',3]
@@ -58,3 +58,19 @@ print([key for key in od.keys()])
 #         print('Failed to delete %s. Reason: %s' % (file_path, e))
 # 
 # =============================================================================
+'''from build_encoding import read_encodings
+encodings = read_encodings()
+print(encodings)'''
+
+'''import numpy as np
+BATCH_SIZE = 10
+TIMES = 4
+
+stopped = np.zeros(5) != 0
+for t in range(TIMES):
+    tm = (np.ones((BATCH_SIZE,1)) * t) / TIMES
+    print(tm)'''
+MAX_F = 12
+for a in range(MAX_F*(5)+1):
+    b = int(a // 5)
+    print(b,b% 5)
