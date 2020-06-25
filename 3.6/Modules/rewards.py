@@ -13,8 +13,10 @@ from collections import OrderedDict
 from time import sleep
 import os, shutil
 import glob
+import math
 
-
+#A scaling factor for reward
+const = math.exp(3)
 
 
 # Cache evaluated molecules (rewards are only calculated once)
@@ -240,6 +242,7 @@ def bunch_evaluation(mols):
 
         if SSSR[i] == True:    
             pIC = predictions[j]
+            val = math.exp(pIC-7)/const
             Evaluations.append([SSSR[i],(pIC-7)/3])
             j = j + 1
         else:
