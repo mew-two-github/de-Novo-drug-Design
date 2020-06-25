@@ -149,7 +149,7 @@ def train(X, actor, critic, decodings, out_dir=None):
 
                 a = int(actions[i])
                 loss = -np.log(probs[i,a]) * td_error[i] #looks same as models.maximisation()
-                target_actor[i,a] = td_error[i]#why is td_error the actor's target?
+                target_actor[i,a] = td_error[i]#This is not the 'target' of the actor but rather a qty used to calculate error fn
 
             # Maximize expected reward.
             actor.fit([old_batch,tm], target_actor, verbose=0)
