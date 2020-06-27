@@ -190,7 +190,7 @@ def bunch_evaluation(mols):
     for mol in mols:
          try:
              Chem.GetSSSR(mol)
-             print(Chem.MolToMolBlock((mol)),file=open(str(folder_path)+'generated'+str(i)+'.mol','w'))
+             print(Chem.MolToMolBlock((mol)),file=open(str(folder_path)+str(i)+'.mol','w'))
              SSSR.append(True)
          except:
              SSSR.append(False)
@@ -201,6 +201,7 @@ def bunch_evaluation(mols):
     X = pd.read_csv(file_path)
     #Filling Null Values
     X.fillna(value=0,inplace=True)
+    X.Name = pd.to_numeric(X.Name, errors='coerce')
     X.sort_values(by='Name',inplace=True)
     X.to_csv('./try.csv',index=False)
     #Removing the columns with zero variance in original data
@@ -242,7 +243,7 @@ def bunch_evaluation(mols):
 
         if SSSR[i] == True:    
             pIC = predictions[j]
-            val = math.exp(pIC-7)/const
+            val = pIC>8
             Evaluations.append([SSSR[i],val])
             j = j + 1
         else:
