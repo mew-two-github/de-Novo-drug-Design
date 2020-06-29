@@ -2,7 +2,6 @@ import sys
 sys.path.insert(0, './Modules/')
 
 from build_encoding import read_decodings, decode
-from rewards import evaluate_chem_mol
 from rdkit.Chem import Draw
 import rdkit.Chem as Chem
 import matplotlib.pyplot as plt

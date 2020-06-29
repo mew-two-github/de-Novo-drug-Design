@@ -5,7 +5,7 @@ from keras import regularizers
 from keras import constraints
 from keras.layers import LSTMCell, LSTM, TimeDistributed, Dense, Input, Lambda, Dropout
 from keras.optimizers import Adam, SGD
-from sklearn.metrics import roc_auc_score
+#from sklearn.metrics import roc_auc_score
 import numpy as np
 from keras import Model
 import rdkit.Chem as Chem

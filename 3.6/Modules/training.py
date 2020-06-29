@@ -1,6 +1,6 @@
 import numpy as np
 from global_parameters import MAX_SWAP, MAX_FRAGMENTS, GAMMA, BATCH_SIZE, EPOCHS, TIMES, FEATURES
-from rewards import get_init_dist, evaluate_mol, modify_fragment, bunch_eval
+from rewards import get_init_dist, modify_fragment, bunch_eval
 import logging
 import pickle as pkl
 
@@ -14,10 +14,11 @@ def train(X, actor, critic, decodings, out_dir=None):
 
     hist = []
 # =============================================================================
-    dist = get_init_dist(X, decodings)
-    np.save('./dist.npy',dist)
+#    dist = get_init_dist(X, decodings)
+#    np.save('./dist.npy',dist)
 # =============================================================================
-#    dist = np.load('./dist.npy')
+    logging.info("dist.npy has been loaded")
+    dist = np.load('./dist.npy')
 #    m = X.shape[1]
 
 
@@ -156,12 +157,12 @@ def train(X, actor, critic, decodings, out_dir=None):
 
             r_tot += rewards[:,0]
 
-        np.save("./Losses/Loss in epoch {}".format(e),loss)
-        np.save("./r_tot",r_tot)
+        np.save("./Losses/Loss in epoch {}.npy".format(e),loss)
         np.save("History/in-{}.npy".format(e), org_mols)
         np.save("History/out-{}.npy".format(e), batch_mol)
         np.save("History/score-{}.npy".format(e), np.asarray(frs))
-
+        if(e%50==0):
+            np.save("History/history.npy",hist)
 
         hist.append([np.mean(r_tot)] + list(np.mean(frs,0)) + [np.mean(np.sum(frs, 1) == 2)])#CHANGED FROM 4 to 2
         print ("Epoch {2} \t Mean score: {0:.3}\t\t Percentage in range: {1},  {3}".format(
