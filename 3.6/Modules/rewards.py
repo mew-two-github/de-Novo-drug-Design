@@ -19,6 +19,7 @@ import math
 const = math.exp(3)
 
 
+
 # Cache evaluated molecules (rewards are only calculated once)
 evaluated_mols = {}
 
@@ -196,7 +197,7 @@ def bunch_evaluation(mols):
              SSSR.append(False)
          i = i +1
     get_padel(folder_path,file_path)
-    sleep(5)
+
       #Reading the descriptors
     X = pd.read_csv(file_path)
     #Filling Null Values
