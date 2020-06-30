@@ -37,10 +37,10 @@ def main(epoch, savefile=None, imagefile=None):
 
 
     plot_mols = [[m1,m2] for m1,m2,u in zip(in_mols,out_mols,use) if u]
-    order = [np.sum(evaluate_chem_mol(out_mols[i])) for i in range(len(out_mols)) if use[i]]
+ #   order = [np.sum(evaluate_chem_mol(out_mols[i])) for i in range(len(out_mols)) if use[i]]
 
-    plot_mols = [x for _,x in sorted(zip(order,plot_mols),key=lambda x:x[0],
-                                     reverse=True)]
+ #   plot_mols = [x for _,x in sorted(zip(order,plot_mols),key=lambda x:x[0],
+ #                                    reverse=True)]
 
 
 

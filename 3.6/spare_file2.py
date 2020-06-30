@@ -11,7 +11,7 @@ from build_encoding import read_encodings
 encodings = read_encodings()
 print(len(encodings.popitem()[1]))
 '''
-
+'''
 import numpy as np
 dist = np.load('dist.npy')
 print(dist)
@@ -22,6 +22,11 @@ c = 0
 val = c==0
 print(val)
 print(np.load('r_tot.npy'))
+'''
+#get_padel(folder_path,file_path)
+import numpy as np
+hist = np.load('history/hist.npy')
+
 
 '''
 #Function that processes the padel descriptors and predicts the value

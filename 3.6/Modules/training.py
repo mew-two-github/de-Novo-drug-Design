@@ -156,7 +156,7 @@ def train(X, actor, critic, decodings, out_dir=None):
             actor.fit([old_batch,tm], target_actor, verbose=0)
 
             r_tot += rewards[:,0]
-
+        np.save("rewards.npy",rewards)
         np.save("./Losses/Loss in epoch {}.npy".format(e),loss)
         np.save("History/in-{}.npy".format(e), org_mols)
         np.save("History/out-{}.npy".format(e), batch_mol)

@@ -1,17 +1,18 @@
 import numpy as np
 import pandas as pd
-import rdkit.Chem as Chem
+from rdkit import Chem
 import numpy as np
 import sys
 import matplotlib.pyplot as plt
 import pickle
 import argparse
+import Show_Epoch
 sys.path.insert(0,'./Modules/')
 from rewards import get_padel, clean_folder
+
 def get_pIC50(mols):
     folder_path =  "./generated_molecules/"
     file_path = "./descriptors.csv"
-    
     #Cleaning up the older files
     clean_folder(folder_path)
     
@@ -22,6 +23,7 @@ def get_pIC50(mols):
     get_padel(folder_path,file_path)
       #Reading the descriptors
     X = pd.read_csv(file_path)
+    print(X.isna().count())
     #Filling Null Values
     X.fillna(value=0,inplace=True)
     X.Name = pd.to_numeric(X.Name, errors='coerce')
@@ -61,14 +63,55 @@ def get_pIC50(mols):
     print('Properties predicted for {} molecules'.format(len(predictions)))
     return predictions
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-SMILES", dest="SMILEFile", help="File containing smiles string separated by ;", default=None)
-parser.add_argument("-image", dest="image", help="File to save image in", default=None)
+def main(epoch):
+    file_name = './past outputs/out'+str(epoch)+'.csv'
+    Show_Epoch.main(epoch,file_name)
 
-df = pd.read_csv('./past outputs/out159.csv',engine="python")
-from rewards import bunch_evaluation
-moli = []
-molm = []
-for i in range(len(df)):
-    moli.append(ch.MolFromSmiles(df.iloc[i,0]))
-    molm.append(ch.MolFromSmiles(df.iloc[i,1]))
+    df = pd.read_csv('./past outputs/out'+str(epoch)+'.csv',sep=";")
+    df.to_csv('./past outputs/out'+str(epoch)+'.csv',sep=";",index=False)
+    moli = []
+    molm = []
+    for i in range(len(df)):
+        if (Chem.MolFromSmiles(df.iloc[i,1])) is not None:
+            moli.append(Chem.MolFromSmiles(df.iloc[i,0]))
+            molm.append(Chem.MolFromSmiles(df.iloc[i,1]))
+    ini = get_pIC50(moli)
+    mod = get_pIC50(molm)
+    ini = np.asarray(ini)
+    mod = np.asarray(mod)
+    
+    changes = pd.DataFrame(np.transpose(np.asarray([ini,mod])),columns=['Modified','Initial'])
+    changes['Delta'] = changes['Modified'] - changes['Initial']
+    changes.sort_values(by='Delta',ascending=False,inplace=True)
+    inact_to_act = changes.loc[(changes['Modified']>7) & (changes['Initial']<7),['Modified','Initial','Delta']].sort_values(by='Delta',ascending=False)
+    
+    changes.to_csv('./past outputs/out_pIC'+str(epoch)+'.csv',index=False)
+    inact_to_act.to_csv('./past outputs/act_pIC'+str(epoch)+'.csv',index=False)
+    
+    print(inact_to_act.head())
+    print(changes.head())
+
+    bins = np.linspace(4,10,14)
+    #changes = changes.loc[changes.Delta>0]
+    plt.hist(changes['Initial'], bins, alpha=0.5, label='initial',color='blue')
+    plt.hist(changes['Modified'], bins, alpha=0.5, label='modified',color='green')
+    plt.legend(loc='upper right')
+    plt.show()
+
+    sp = changes.loc[changes['Delta']>0].sum()['Delta']
+    sn = changes.loc[changes['Delta']<0].sum()['Delta']
+    cp = changes.loc[changes['Delta']>0].count()['Delta']
+    cn = changes.loc[changes['Delta']<0].count()['Delta']
+    print('Sum of positive changes = {}\tNo. of +ves = {}\nSum of negative changes = {}\tNo. of -ves = {}'.format(sp,cp,sn,cn))
+    return 0
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-epoch", dest="epoch", help="Epoch for which the results are to be viewed", default=None)
+if __name__ == "__main__":
+
+    args = parser.parse_args()
+    epoch = int(args.epoch)
+    main(int(args.epoch))
+
+
