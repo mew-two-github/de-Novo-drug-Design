@@ -1,7 +1,10 @@
+import sys
+sys.path.insert(0,'./Modules/')
 import numpy as np
 from file_reader import read_file
 import pandas as pd
 from rdkit import Chem
+from mol_utils import get_fragments
 import numpy as np
 import sys
 import matplotlib.pyplot as plt
@@ -9,8 +12,10 @@ import pickle
 import argparse
 import Show_Epoch
 import logging
+from keras.utils.generic_utils import get_custom_objects
 import keras
 sys.path.insert(0,'./Modules/')
+from models import maximization
 from rewards import get_padel, clean_folder, modify_fragment
 from build_encoding import get_encodings, encode_molecule, decode_molecule, encode_list, save_decodings, save_encodings, read_decodings, read_encodings
 from global_parameters import MAX_SWAP, MAX_FRAGMENTS, GAMMA, BATCH_SIZE, EPOCHS, TIMES, FEATURES
@@ -73,7 +78,9 @@ def modify_mols(X,decodings):
     BATCH_SIZE = len(X)
     n_actions = MAX_FRAGMENTS * MAX_SWAP + 1
     stopped = np.zeros(BATCH_SIZE) != 0
-    actor = keras.models.load_model('./saved_models/generation')
+    #loss = maximization()
+    #get_custom_objects().update({"maximization": loss.computeloss})
+    actor = keras.models.load_model('./saved_models/generation', custom_objects={'maximization': maximization})
     TIMES = 1
     for t in range(TIMES):
         #for each mol, a no. between 0-1 indicating the time-step
@@ -114,9 +121,25 @@ def modify_mols(X,decodings):
 def main(epoch,gen):
     if gen == 1:
         lead_file = "Data/AKT_pchembl.csv"
+        fragment_file = "Data/molecules.smi"
+        fragment_mols = read_file(fragment_file)
         lead_mols = read_file(lead_file)
+        fragment_mols += lead_mols
+
+        logging.info("Read %s molecules for fragmentation library", len(fragment_mols))
+        logging.info("Read %s lead molecules", len(lead_mols))
+
+        fragments, used_mols = get_fragments(fragment_mols)
+        logging.info("Num fragments: %s", len(fragments))
+        logging.info("Total molecules used: %s", len(used_mols))
+        assert len(fragments)
+        assert len(used_mols)
+        lead_mols = np.asarray(fragment_mols[-len(lead_mols):])[used_mols[-len(lead_mols):]]
+
         decodings = read_decodings()
         encodings = read_encodings()
+        logging.info("Loaded encodings and decodings")
+
         X = encode_list(lead_mols, encodings)
         modify_mols(X,decodings)
         epoch=1250
@@ -125,7 +148,6 @@ def main(epoch,gen):
     Show_Epoch.main(epoch,file_name)
 
     df = pd.read_csv('./past outputs/out'+str(epoch)+'.csv',sep=";")
-    df.to_csv('./past outputs/out'+str(epoch)+'.csv',sep=";",index=False)
         
     moli = []
     molm = []
@@ -168,12 +190,13 @@ def main(epoch,gen):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-epoch", dest="epoch", help="Epoch for which the results are to be viewed", default=-1)
-parser.add_argument("-gen_mode",dest="gen",help="Pass as 1 if you want to generate new molecules",default=0)
+parser.add_argument("-epoch", dest="epoch", help="Epoch for which the results are to be viewed", default=0)
+parser.add_argument("-gen",dest="gen",help="Pass as 1 if you want to generate new molecules",default=0)
 if __name__ == "__main__":
 
     args = parser.parse_args()
     epoch = int(args.epoch)
+    gen = int(args.gen)
     main(int(args.epoch),int(gen))
 
 

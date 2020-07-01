@@ -1,3 +1,12 @@
+    for mol in mols:
+         try:
+             Chem.GetSSSR(mol)
+             print(Chem.MolToMolBlock((mol)),file=open(str(folder_path)+str(i)+'.mol','w'))
+             SSSR.append(True)
+         except:
+             SSSR.append(False)
+         i = i +1
+    get_padel(folder_path,file_path)
 """ from collections import OrderedDict
 od = OrderedDict()
 od.update({'a':1,'b':2})

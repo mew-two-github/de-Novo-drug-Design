@@ -97,9 +97,6 @@ def bunch_evaluation(mols):
       #Reading the descriptors
     X = pd.read_csv(file_path)
     #Filling Null Values
-    for col in X.columns:
-        if X[col].isna().any() == True:
-            print(col)
     X.fillna(value=0,inplace=True)
     X.Name = pd.to_numeric(X.Name, errors='coerce')
     X.sort_values(by='Name',inplace=True)
@@ -143,7 +140,8 @@ def bunch_evaluation(mols):
 
         if SSSR[i] == True:    
             pIC = predictions[j]
-            val = exp(pIC-7)/math
+            val = math.exp(pIC-7)/const
+
             Evaluations.append([SSSR[i],val])
             j = j + 1
         else:

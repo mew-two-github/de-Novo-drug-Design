@@ -22,7 +22,7 @@ def main(fragment_file, lead_file):
     fragment_mols += lead_mols
 
     logging.info("Read %s molecules for fragmentation library", len(fragment_mols))
-    logging.info("Read %s lead moleculs", len(lead_mols))
+    logging.info("Read %s lead molecules", len(lead_mols))
 
     fragments, used_mols = get_fragments(fragment_mols)
     logging.info("Num fragments: %s", len(fragments))
