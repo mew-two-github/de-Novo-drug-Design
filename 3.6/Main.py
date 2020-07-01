@@ -49,7 +49,7 @@ def main(fragment_file, lead_file):
     actor, critic = build_models(X.shape[1:])
 
     #X = clean_good(X, decodings)
-    print(X.shape)
+    #print(X.shape)
     if X.shape[0] == 0:
         return -1
     logging.info("Training")

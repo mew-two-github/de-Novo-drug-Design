@@ -51,9 +51,8 @@ def get_init_dist(X, decodings):
     return dist
 
 #function to get Padel descriptors and store in a csv file
-def get_padel(mol_folder_path,file_path):
+def get_padel(mol_folder_path,file_path,max_time='1500'):
     Padel_path = 'C:\\Users\\HP\\PaDEL-Descriptor\\PaDEL-Descriptor.jar'
-    max_time = '5000' #in milliseconds
     cmd_list = ['java','-jar',Padel_path, '-dir', mol_folder_path, '-2d','-file', file_path,'-maxruntime', max_time,"-descriptortypes", 'fd.xml','-usefilenameasmolname']
     out = subprocess.Popen(cmd_list, 
            stdout=subprocess.PIPE, 
@@ -98,10 +97,13 @@ def bunch_evaluation(mols):
       #Reading the descriptors
     X = pd.read_csv(file_path)
     #Filling Null Values
+    for col in X.columns:
+        if X[col].isna().any() == True:
+            print(col)
     X.fillna(value=0,inplace=True)
     X.Name = pd.to_numeric(X.Name, errors='coerce')
     X.sort_values(by='Name',inplace=True)
-    X.to_csv('./try.csv',index=False)
+    #X.to_csv('./try.csv',index=False)
     #Removing the columns with zero variance in original data
     with open('./saved_models/drop.txt','rb') as fp:
         bad_cols = pickle.load(fp)
@@ -123,7 +125,7 @@ def bunch_evaluation(mols):
     #     X.to_csv('./X.csv',index=False)
     #     X_step1.to_csv('./X_step1.csv')
     #     X_step2.to_csv('./X_step2.csv')
-    #     X_step3.to_csv('./X_step3.csv')
+    X_step3.to_csv('./X_step3.csv')
     # =============================================================================
     
     
@@ -141,7 +143,7 @@ def bunch_evaluation(mols):
 
         if SSSR[i] == True:    
             pIC = predictions[j]
-            val = pIC>8
+            val = exp(pIC-7)/math
             Evaluations.append([SSSR[i],val])
             j = j + 1
         else:

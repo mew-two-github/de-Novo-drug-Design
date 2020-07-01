@@ -14,11 +14,13 @@ def train(X, actor, critic, decodings, out_dir=None):
 
     hist = []
 # =============================================================================
-#    dist = get_init_dist(X, decodings)
-#    np.save('./dist.npy',dist)
+    dist = get_init_dist(X, decodings)
+    np.save('./dist_exp.npy',dist)
+    logging.info("Printing initial distribution")
+    print(dist)
 # =============================================================================
     logging.info("dist.npy has been loaded")
-    dist = np.load('./dist.npy')
+#    dist = np.load('./dist.npy')
 #    m = X.shape[1]
 
 
@@ -59,7 +61,7 @@ def train(X, actor, critic, decodings, out_dir=None):
                     if rand_select[i] < 0 or a + 1 == n_actions:
                         break
                     a += 1
-                #Collecting number of significant actions?
+                #choosing a random action
                 actions[i] = a
 
             # Initial critic value(predicts the optimal state value)
@@ -163,7 +165,7 @@ def train(X, actor, critic, decodings, out_dir=None):
         np.save("History/score-{}.npy".format(e), np.asarray(frs))
         if(e%50==0):
             np.save("History/history.npy",hist)
-
+            actor.save('./saved_models/generation')
         hist.append([np.mean(r_tot)] + list(np.mean(frs,0)) + [np.mean(np.sum(frs, 1) == 2)])#CHANGED FROM 4 to 2
         print ("Epoch {2} \t Mean score: {0:.3}\t\t Percentage in range: {1},  {3}".format(
             np.mean(r_tot), (np.mean(frs,0),2), e,#Removed a round for loop
