@@ -116,6 +116,8 @@ def train(X, actor, critic, decodings, out_dir=None):
                             #rewards[i] *= 2
                     else:
                         frs.append([False] * FEATURES)
+                        rewards[i] -= 1
+
                         
                 
                 #Storing all modified molecules
@@ -128,17 +130,21 @@ def train(X, actor, critic, decodings, out_dir=None):
                 for i in range(len(modified_mols)):
                     molecules.append(org_mole[i][0])    
                 org_mole_evaluation = bunch_eval(molecules,e,decodings)
-                evaluation = evaluation-org_mole_evaluation
+
+                for i in range(len(evaluation)):
+                    if (evaluation[i,0]) == True:
+                        evaluation[i,1] = evaluation[i,1]-org_mole_evaluation[i,1]
+                
                 with open('./evaluation.pkl','wb') as f:
                     pkl.dump(evaluation,f)
                 print("Shape of returned evaluations:{}".format(evaluation.shape))
                 #Updating Rewards
                 for i in range(len(modified_mols)):
-                    fr = evaluation[i]
+                    fr = float(evaluation[i,1])
                     frs.append(fr)
                     rewards[modified_mols[i][1]] += fr
 
-                print("Updating distribution")
+                print("Shape of rewards",rewards.shape)
                 # Update distribution of rewards
               #  dist = 0.5 * dist + 0.5 * (1.0/FEATURES * BATCH_SIZE / (1.0 + np.sum(frs,0)))
 

@@ -140,12 +140,12 @@ def bunch_evaluation(mols):
 
         if SSSR[i] == True:    
             pIC = predictions[j]
-            val = (math.exp(pIC-6.5) - math.exp(6.5-pIC))/const
+            val = pIC
 
             Evaluations.append([SSSR[i],val])
             j = j + 1
         else:
-            Evaluations.append([False]*2)
+            Evaluations.append([False,-10])
     print(' Evaluations completed')
     return Evaluations
     
@@ -159,7 +159,7 @@ def bunch_eval(fs, epoch, decodings):
     keys = []
     od = OrderedDict()
     total_molecules = len(fs)
-    print("Evaluating totally {} molecules".format(total_molecules))
+    #print("Evaluating totally {} molecules".format(total_molecules))
     for f in fs:
         key = get_key(f)
         keys.append(key)
@@ -180,12 +180,13 @@ def bunch_eval(fs, epoch, decodings):
                 to_evaluate.append(mol)
                # evaluated_mols[key] = (np.array(ret_val), epoch)
             except:
-                od[key] = [False] * 2
+                od[key] = [False,-10]
         i = i + 1
     print('New molecules for evaluation: {}'.format(len(to_evaluate)))
     if len(to_evaluate)!=0:
         Evaluations = bunch_evaluation(to_evaluate)
-        print("Length of Evaluations {}".format(len(Evaluations)))
+        #print("Length of Evaluations {}".format(len(Evaluations)))
+        assert len(Evaluations) == len(to_evaluate)
         for i in range(len(Evaluations)):
             for key in unused:
                 if od[key] == i:
@@ -196,7 +197,7 @@ def bunch_eval(fs, epoch, decodings):
     with open('./ret_vals.pkl','wb') as f:
         pickle.dump(ret_vals,f)
     for key in keys:
-        ret_vals.append(np.asarray(od[key][1]))
+        ret_vals.append(np.asarray(od[key]))
     ret_vals = np.asarray(ret_vals)
     print('Shape of return values {}'.format(ret_vals.shape))
     return (ret_vals)
