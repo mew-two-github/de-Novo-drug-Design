@@ -25,7 +25,8 @@ print(np.load('r_tot.npy'))
 '''
 #get_padel(folder_path,file_path)
 import numpy as np
-hist = np.load('history/hist.npy')
+hist = np.load('history/history.npy')
+print(np.argmax(hist))
 
 
 '''

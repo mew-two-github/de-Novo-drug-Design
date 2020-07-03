@@ -14,12 +14,12 @@ def train(X, actor, critic, decodings, out_dir=None):
 
     hist = []
 # =============================================================================
-    dist = get_init_dist(X, decodings)
-    np.save('./dist_exp.npy',dist)
-    logging.info("Printing initial distribution")
-    print(dist)
+#    dist = get_init_dist(X, decodings)
+#    np.save('./dist_exp.npy',dist)
+#    logging.info("Printing initial distribution")
+#    print(dist)
 # =============================================================================
-    logging.info("dist.npy has been loaded")
+    #logging.info("dist.npy has been loaded")
 #    dist = np.load('./dist.npy')
 #    m = X.shape[1]
 
@@ -97,6 +97,7 @@ def train(X, actor, critic, decodings, out_dir=None):
                 frs = []
                 print ("Final round of epoch {}".format(e))
                 modified_mols = []
+                org_mole = []
                 print((batch_mol.shape[0]))
                 for i in range(batch_mol.shape[0]):
 # =============================================================================
@@ -106,6 +107,7 @@ def train(X, actor, critic, decodings, out_dir=None):
                     # If molecule was modified
                     if not np.all(org_mols[i] == batch_mol[i]):
                         modified_mols.append([batch_mol[i],i])
+                        org_mole.append([org_mols[i],i])
                         # fr = evaluate_mol(batch_mol[i], e, decodings)
                         # frs.append(fr)
                         # rewards[i] += np.sum(fr * dist)
@@ -114,29 +116,37 @@ def train(X, actor, critic, decodings, out_dir=None):
                             #rewards[i] *= 2
                     else:
                         frs.append([False] * FEATURES)
+                        rewards[i] -= 1
+
                         
                 
                 #Storing all modified molecules
                 molecules = []
                 for i in range(len(modified_mols)):
                     molecules.append(modified_mols[i][0])
-                
-               # print(len(molecules),molecules[0])
-                    
-                #Evaluating multiple molecules at the same time
                 evaluation = bunch_eval(molecules,e,decodings)
+               # print(len(molecules),molecules[0])
+                molecules = []
+                for i in range(len(modified_mols)):
+                    molecules.append(org_mole[i][0])    
+                org_mole_evaluation = bunch_eval(molecules,e,decodings)
+
+                for i in range(len(evaluation)):
+                    if (evaluation[i,0]) == True:
+                        evaluation[i,1] = evaluation[i,1]-org_mole_evaluation[i,1]
+                
                 with open('./evaluation.pkl','wb') as f:
                     pkl.dump(evaluation,f)
                 print("Shape of returned evaluations:{}".format(evaluation.shape))
                 #Updating Rewards
                 for i in range(len(modified_mols)):
-                    fr = evaluation[i]
+                    fr = float(evaluation[i,1])
                     frs.append(fr)
-                    rewards[modified_mols[i][1]] += np.sum(fr*dist)
+                    rewards[modified_mols[i][1]] += fr
 
-                print("Updating distribution")
+                print("Shape of rewards",rewards.shape)
                 # Update distribution of rewards
-                dist = 0.5 * dist + 0.5 * (1.0/FEATURES * BATCH_SIZE / (1.0 + np.sum(frs,0)))
+              #  dist = 0.5 * dist + 0.5 * (1.0/FEATURES * BATCH_SIZE / (1.0 + np.sum(frs,0)))
 
 
             # Calculate TD-error
@@ -166,10 +176,9 @@ def train(X, actor, critic, decodings, out_dir=None):
         if(e%50==0):
             np.save("History/history.npy",hist)
             actor.save('./saved_models/generation')
-        hist.append([np.mean(r_tot)] + list(np.mean(frs,0)) + [np.mean(np.sum(frs, 1) == 2)])#CHANGED FROM 4 to 2
-        print ("Epoch {2} \t Mean score: {0:.3}\t\t Percentage in range: {1},  {3}".format(
-            np.mean(r_tot), (np.mean(frs,0),2), e,#Removed a round for loop
-            (np.mean(np.sum(frs, 1) == 2))#FIRST FOUR CHANGED TO TWO and removed round
+        hist.append([np.mean(r_tot)])#CHANGED FROM 4 to 2
+        print ("Epoch {1} \t Mean score: {0:.3}".format(
+            np.mean(r_tot), e,#Removed a round for loop
         ))
         
 
