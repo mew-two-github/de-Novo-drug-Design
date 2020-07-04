@@ -14,6 +14,7 @@ from time import sleep
 import os, shutil
 import glob
 import math
+import xgboost as xgb
 
 #A scaling factor for reward
 const = math.exp(3)
@@ -102,7 +103,7 @@ def bunch_evaluation(mols):
 
     bad = []
     with open('./saved_models/good_columns','rb') as f:
-        cols = pkl.load(f)
+        cols = pickle.load(f)
     for col in xg_all.columns:
         if col not in cols:
             bad.append(col)
@@ -114,27 +115,28 @@ def bunch_evaluation(mols):
     files = xg_all[pd.isnull(xg_all).any(axis=1)]['Name']
     xg_all.dropna(inplace=True)
     mol= []
-    for f in files:
-        m = Chem.MolFromMolFile(folder_path+str(f)+'.mol')
-        mol.append(m)
+    if len(files) !=0:
+        for f in files:
+            m = Chem.MolFromMolFile(folder_path+str(f)+'.mol')
+            mol.append(m)
 
-    i = 0
-    for m in mol:
-        print(Chem.MolToMolBlock((m)),file=open(str(folder_path)+str(files[i])+'.mol','w'))
-        i = i + 1
-    get_padel(folder_path,'./uneval_desc.csv','-1')
-    unevalmol = pd.read_csv('./uneval_desc.csv')
+        i = 0
+        for m in mol:
+            print(Chem.MolToMolBlock((m)),file=open(str(folder_path)+str(files[i])+'.mol','w'))
+            i = i + 1
+        get_padel(folder_path,'./uneval_desc.csv','-1')
+        unevalmol = pd.read_csv('./uneval_desc.csv')
 
 
-    unevalmol.drop(columns=bad,inplace=True)
-    print(unevalmol.isna().sum(axis=1))
+        unevalmol.drop(columns=bad,inplace=True)
+        print(unevalmol.isna().sum(axis=1))
+        xg_all = pd.concat([xg_all,unevalmol])
 
     regressor = xgb.XGBRegressor()
     regressor.load_model('./saved_models/best_from_gs38.model')
 
-    xg_all_all = pd.concat([xg_all,unevalmol])
-    xg_all_all.sort_values(by='Name',inplace=True)
-    xg_all_all.drop(columns='Name',inplace=True)
+    xg_all.sort_values(by='Name',inplace=True)
+    xg_all.drop(columns='Name',inplace=True)
     preds = regressor.predict(xg_all_all)
     
     print('Properties predicted for {} molecules'.format(len(preds)))
@@ -163,7 +165,7 @@ def bunch_eval(fs, epoch, decodings):
     global evaluated_mols
     keys = []
     od = OrderedDict()
-    total_molecules = len(fs)
+    #total_molecules = len(fs)
     #print("Evaluating totally {} molecules".format(total_molecules))
     for f in fs:
         key = get_key(f)
