@@ -181,6 +181,7 @@ def bunch_eval(fs, epoch, decodings):
                # evaluated_mols[key] = (np.array(ret_val), epoch)
             except:
                 od[key] = [False,-10]
+                evaluated_mols[key] = (np.asarray([False,-10]),epoch)
         i = i + 1
     print('New molecules for evaluation: {}'.format(len(to_evaluate)))
     if len(to_evaluate)!=0:

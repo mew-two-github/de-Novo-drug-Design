@@ -115,8 +115,8 @@ def modify_mols(X,decodings):
 
                 batch_mol[i,a] = modify_fragment(batch_mol[i,a], s)#changes 0 to 1 and 1 to 0
             #Evaluating multiple molecules at the same time
-            np.save("./History/in.npy", org_mols)
-            np.save("./History/out.npy", batch_mol)
+            np.save("./History/in-1250.npy", org_mols)
+            np.save("./History/out-1250.npy", batch_mol)
 
 def main(epoch,gen):
     if gen == 1:

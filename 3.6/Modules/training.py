@@ -3,6 +3,10 @@ from global_parameters import MAX_SWAP, MAX_FRAGMENTS, GAMMA, BATCH_SIZE, EPOCHS
 from rewards import get_init_dist, modify_fragment, bunch_eval
 import logging
 import pickle as pkl
+import winsound
+frequency = 2500  # Set Frequency To 2500 Hertz
+duration = 1000  # Set Duration To 1000 ms == 1 second
+
 
 scores = 1. / TIMES
 n_actions = MAX_FRAGMENTS * MAX_SWAP + 1
@@ -75,7 +79,7 @@ def train(X, actor, critic, decodings, out_dir=None):
                 if stopped[i] or a == n_actions - 1:
                     stopped[i] = True
                     if t == 0:
-                        rewards[i] += -1. #Why?
+                        rewards[i] += -1. #Why and why -1?
 
                     continue
 
@@ -90,7 +94,7 @@ def train(X, actor, critic, decodings, out_dir=None):
 
                     batch_mol[i,a] = modify_fragment(batch_mol[i,a], s)#changes 0 to 1 and 1 to 0
                 else:
-                    rewards[i] -= 0.1   #why 0.1?
+                    rewards[i] -= 10   #why 0.1? CHANGED THIS TO 10
 
             # If final round
             if t + 1 == TIMES:
@@ -115,8 +119,8 @@ def train(X, actor, critic, decodings, out_dir=None):
                         #if all(fr):
                             #rewards[i] *= 2
                     else:
-                        frs.append([False] * FEATURES)
-                        rewards[i] -= 1
+                        frs.append([False,-15])
+                        rewards[i] -= 15
 
                         
                 
@@ -124,19 +128,24 @@ def train(X, actor, critic, decodings, out_dir=None):
                 molecules = []
                 for i in range(len(modified_mols)):
                     molecules.append(modified_mols[i][0])
-                evaluation = bunch_eval(molecules,e,decodings)
-               # print(len(molecules),molecules[0])
-                molecules = []
-                for i in range(len(modified_mols)):
-                    molecules.append(org_mole[i][0])    
-                org_mole_evaluation = bunch_eval(molecules,e,decodings)
 
-                for i in range(len(evaluation)):
-                    if (evaluation[i,0]) == True:
-                        evaluation[i,1] = evaluation[i,1]-org_mole_evaluation[i,1]
-                
+                if len(molecules)!=0:
+                    evaluation = bunch_eval(molecules,e,decodings)
+                # print(len(molecules),molecules[0])
+                    molecules = []
+                    for i in range(len(modified_mols)):
+                        molecules.append(org_mole[i][0])    
+                    org_mole_evaluation = bunch_eval(molecules,e,decodings)
+                    for i in range(len(evaluation)):
+                        if (evaluation[i,0]) == True:
+                            evaluation[i,1] = evaluation[i,1]-org_mole_evaluation[i,1]
+                else:
+                    evaluation = np.array(shape=(len(batch_mol),2),dtype='float64')
+                    evaluation[0] = np.full(shape=(len(batch_mol),2),value=0)
+                    evaluation[1] = np.full(shape=(len(batch_mol),2),value=-10)
                 with open('./evaluation.pkl','wb') as f:
                     pkl.dump(evaluation,f)
+
                 print("Shape of returned evaluations:{}".format(evaluation.shape))
                 #Updating Rewards
                 for i in range(len(modified_mols)):
@@ -166,7 +175,7 @@ def train(X, actor, critic, decodings, out_dir=None):
 
             # Maximize expected reward.
             actor.fit([old_batch,tm], target_actor, verbose=0)
-
+           
             r_tot += rewards[:,0]
         np.save("rewards.npy",rewards)
         np.save("./Losses/Loss in epoch {}.npy".format(e),loss)

@@ -23,12 +23,21 @@ val = c==0
 print(val)
 print(np.load('r_tot.npy'))
 '''
+
 #get_padel(folder_path,file_path)
 import numpy as np
+import matplotlib.pyplot as plt
 hist = np.load('history/history.npy')
 print(np.argmax(hist))
+plt.plot(range(len(hist)),hist)
+plt.show()
 
-
+'''
+import winsound
+frequency = 2500  # Set Frequency To 2500 Hertz
+duration = 1000
+winsound.Beep(frequency,duration)
+'''
 '''
 #Function that processes the padel descriptors and predicts the value
 def get_pIC(mol):

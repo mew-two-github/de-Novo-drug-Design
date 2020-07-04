@@ -30,15 +30,15 @@ def main(fragment_file, lead_file):
     assert len(fragments)
     assert len(used_mols)
 # =============================================================================
-#     encodings, decodings = get_encodings(fragments)
-#     save_encodings(encodings)
-#     save_decodings(decodings)
-#     logging.info("Saved encodings and decodings")
+    encodings, decodings = get_encodings(fragments)
+    save_encodings(encodings)
+    save_decodings(decodings)
+    logging.info("Saved encodings and decodings")
 # =============================================================================
     lead_mols = np.asarray(fragment_mols[-len(lead_mols):])[used_mols[-len(lead_mols):]]
     
-    decodings = read_decodings()
-    encodings = read_encodings()
+#    decodings = read_decodings()
+#    encodings = read_encodings()
     logging.info("Loaded encodings and decodings")
     
     X = encode_list(lead_mols, encodings)
