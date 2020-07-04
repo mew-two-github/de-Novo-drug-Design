@@ -11,7 +11,7 @@ duration = 1000  # Set Duration To 1000 ms == 1 second
 scores = 1. / TIMES
 n_actions = MAX_FRAGMENTS * MAX_SWAP + 1
 
-
+losses = []
 
 # Train actor and critic networks
 def train(X, actor, critic, decodings, out_dir=None):
@@ -177,12 +177,14 @@ def train(X, actor, critic, decodings, out_dir=None):
             actor.fit([old_batch,tm], target_actor, verbose=0)
            
             r_tot += rewards[:,0]
-        np.save("rewards.npy",rewards)
-        np.save("./Losses/Loss in epoch {}.npy".format(e),loss)
+        #np.save("rewards.npy",rewards)
+        #np.save("./Losses/Loss in epoch {}.npy".format(e),loss)
+        losses.append(loss)
         np.save("History/in-{}.npy".format(e), org_mols)
         np.save("History/out-{}.npy".format(e), batch_mol)
         np.save("History/score-{}.npy".format(e), np.asarray(frs))
         if(e%50==0):
+            np.save("./Losses/Loss.npy",losses)
             np.save("History/history.npy",hist)
             actor.save('./saved_models/generation')
         hist.append([np.mean(r_tot)])#CHANGED FROM 4 to 2

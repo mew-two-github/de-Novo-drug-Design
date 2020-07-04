@@ -53,7 +53,7 @@ def get_init_dist(X, decodings):
 #function to get Padel descriptors and store in a csv file
 def get_padel(mol_folder_path,file_path,max_time='1500'):
     Padel_path = 'C:\\Users\\HP\\PaDEL-Descriptor\\PaDEL-Descriptor.jar'
-    cmd_list = ['java','-jar',Padel_path, '-dir', mol_folder_path, '-2d','-file', file_path,'-maxruntime', max_time,"-descriptortypes", 'fd.xml','-usefilenameasmolname']
+    cmd_list = ['java','-jar',Padel_path, '-dir', mol_folder_path, '-2d','-file', file_path,'-maxruntime', max_time,"-descriptortypes", 'xg_desc3.xml','-usefilenameasmolname']
     out = subprocess.Popen(cmd_list, 
            stdout=subprocess.PIPE, 
            stderr=subprocess.STDOUT)
