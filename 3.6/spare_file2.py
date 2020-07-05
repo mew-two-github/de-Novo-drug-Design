@@ -23,7 +23,7 @@ val = c==0
 print(val)
 print(np.load('r_tot.npy'))
 '''
-
+'''
 #get_padel(folder_path,file_path)
 import numpy as np
 import matplotlib.pyplot as plt
@@ -31,7 +31,43 @@ hist = np.load('history/history.npy')
 print(np.argmax(hist))
 plt.plot(range(len(hist)),hist)
 plt.show()
+'''
+'''
+import pandas as pd
+import numpy as np
+import pickle
+import rdkit.Chem as Chem
+import sys
+import os
+sys.path.insert(0,'./Modules')
+from rewards import clean_folder, get_padel
+file_path = "./descriptors.csv"
+xg_all = pd.read_csv(file_path)
+folder_path =  "./generated_molecules/"
+names = xg_all['Name']
+bad = []
+with open('./saved_models/good_columns','rb') as f:
+    cols = pickle.load(f)
+for col in xg_all.columns:
+    if col not in cols:
+            bad.append(col)
+xg_all.drop(columns=bad,inplace=True)
+#Verifying that all the required columns are there
+assert len(xg_all.columns) == len(cols)
+xg_all['Name'] = names
 
+files = xg_all[pd.isnull(xg_all).any(axis=1)]['Name']
+print(files)
+uneval_folder = "./unevalmol/"
+for i in files:
+    clean_folder(uneval_folder)
+    m = Chem.MolFromMolFile(folder_path+str(i)+'.mol')
+    print(Chem.MolToMolBlock((m)),file=open(str(i)+'.mol','w'))
+    os.move
+
+get_padel(uneval_folder,'./uneval_desc.csv','-1')
+unevalmol = pd.read_csv('./uneval_desc.csv')
+'''
 '''
 import winsound
 frequency = 2500  # Set Frequency To 2500 Hertz

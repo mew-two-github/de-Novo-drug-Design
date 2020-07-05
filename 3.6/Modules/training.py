@@ -139,10 +139,10 @@ def train(X, actor, critic, decodings, out_dir=None):
                     for i in range(len(evaluation)):
                         if (evaluation[i,0]) == True:
                             evaluation[i,1] = evaluation[i,1]-org_mole_evaluation[i,1]
-                else:
-                    evaluation = np.array(shape=(len(batch_mol),2),dtype='float64')
-                    evaluation[0] = np.full(shape=(len(batch_mol),2),value=0)
-                    evaluation[1] = np.full(shape=(len(batch_mol),2),value=-10)
+              #  else:
+               #     evaluation = np.zeros(shape=(len(batch_mol),2),dtype='float64')
+                #    evaluation[0] = np.full(shape=(len(batch_mol),2),fill_value=0)
+                #    evaluation[1] = np.full(shape=(len(batch_mol),2),fill_value=-10)
                 with open('./evaluation.pkl','wb') as f:
                     pkl.dump(evaluation,f)
 

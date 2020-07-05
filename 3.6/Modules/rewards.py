@@ -79,7 +79,8 @@ def clean_folder(folder_path):
 def bunch_evaluation(mols):
     folder_path =  "./generated_molecules/"
     file_path = "./descriptors.csv"
-    
+    f = open(file_path, "w+")
+    f.close()
     #Cleaning up the older files
     clean_folder(folder_path)
     
@@ -90,9 +91,10 @@ def bunch_evaluation(mols):
              Chem.GetSSSR(mol)
              print(Chem.MolToMolBlock((mol)),file=open(str(folder_path)+str(i)+'.mol','w'))
              SSSR.append(True)
+             i = i + 1
          except:
              SSSR.append(False)
-         i = i +1
+         
 
     get_padel(folder_path,file_path)
 
@@ -116,30 +118,28 @@ def bunch_evaluation(mols):
     xg_all.dropna(inplace=True)
     mol= []
     if len(files) !=0:
+        uneval_folder = "C:\\Users\\HP\\AZC_Internship\\DeepFMPO\\3.6\\unevalmol\\"
+        clean_folder(uneval_folder)
         for f in files:
             m = Chem.MolFromMolFile(folder_path+str(f)+'.mol')
-            mol.append(m)
+            print(Chem.MolToMolBlock((m)),file=open(str(uneval_folder)+str(f)+'.mol','w'))
 
-        i = 0
-        for m in mol:
-            print(Chem.MolToMolBlock((m)),file=open(str(folder_path)+str(files[i])+'.mol','w'))
-            i = i + 1
-        get_padel(folder_path,'./uneval_desc.csv','-1')
+        get_padel(uneval_folder,'./uneval_desc.csv','-1')
         unevalmol = pd.read_csv('./uneval_desc.csv')
-
 
         unevalmol.drop(columns=bad,inplace=True)
         print(unevalmol.isna().sum(axis=1))
         xg_all = pd.concat([xg_all,unevalmol])
-
+    xg_all.to_csv('./xgall.csv')
+    xg_all.fillna(value=0,inplace=True)
     regressor = xgb.XGBRegressor()
     regressor.load_model('./saved_models/best_from_gs38.model')
 
     xg_all.sort_values(by='Name',inplace=True)
     xg_all.drop(columns='Name',inplace=True)
-    preds = regressor.predict(xg_all_all)
+    predictions = regressor.predict(xg_all)
     
-    print('Properties predicted for {} molecules'.format(len(preds)))
+    print('Properties predicted for {} molecules'.format(len(predictions)))
     
     Evaluations = []
     j  = 0
