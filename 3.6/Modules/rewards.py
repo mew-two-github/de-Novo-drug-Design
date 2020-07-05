@@ -52,7 +52,7 @@ def get_init_dist(X, decodings):
     return dist
 
 #function to get Padel descriptors and store in a csv file
-def get_padel(mol_folder_path,file_path,max_time='1500'):
+def get_padel(mol_folder_path,file_path,max_time='5000'):
     Padel_path = 'C:\\Users\\HP\\PaDEL-Descriptor\\PaDEL-Descriptor.jar'
     cmd_list = ['java','-jar',Padel_path, '-dir', mol_folder_path, '-2d','-file', file_path,'-maxruntime', max_time,"-descriptortypes", 'xg_desc3.xml','-usefilenameasmolname']
     out = subprocess.Popen(cmd_list, 
@@ -79,8 +79,7 @@ def clean_folder(folder_path):
 def bunch_evaluation(mols):
     folder_path =  "./generated_molecules/"
     file_path = "./descriptors.csv"
-    f = open(file_path, "w+")
-    f.close()
+    
     #Cleaning up the older files
     clean_folder(folder_path)
     
@@ -91,11 +90,9 @@ def bunch_evaluation(mols):
              Chem.GetSSSR(mol)
              print(Chem.MolToMolBlock((mol)),file=open(str(folder_path)+str(i)+'.mol','w'))
              SSSR.append(True)
-             i = i + 1
          except:
              SSSR.append(False)
-         
-
+         i = i +1
     get_padel(folder_path,file_path)
 
     #Reading the descriptors
@@ -113,7 +110,7 @@ def bunch_evaluation(mols):
     #Verifying that all the required columns are there
     assert len(xg_all.columns) == len(cols)
     xg_all['Name'] = names
-
+    print("Number of problematic evaluations",len(xg_all.isna().sum(axis=1)))
     files = xg_all[pd.isnull(xg_all).any(axis=1)]['Name']
     xg_all.dropna(inplace=True)
     mol= []
@@ -130,7 +127,7 @@ def bunch_evaluation(mols):
         unevalmol.drop(columns=bad,inplace=True)
         print(unevalmol.isna().sum(axis=1))
         xg_all = pd.concat([xg_all,unevalmol])
-    xg_all.to_csv('./xgall.csv')
+    #xg_all.to_csv('./xgall.csv')
     xg_all.fillna(value=0,inplace=True)
     regressor = xgb.XGBRegressor()
     regressor.load_model('./saved_models/best_from_gs38.model')
@@ -147,12 +144,12 @@ def bunch_evaluation(mols):
 
         if SSSR[i] == True:    
             pIC = predictions[j]
-            val = pIC
+            val = math.exp(pIC-7)/const
 
             Evaluations.append([SSSR[i],val])
             j = j + 1
         else:
-            Evaluations.append([False,-10])
+            Evaluations.append([False]*2)
     print(' Evaluations completed')
     return Evaluations
     
@@ -165,8 +162,8 @@ def bunch_eval(fs, epoch, decodings):
     global evaluated_mols
     keys = []
     od = OrderedDict()
-    #total_molecules = len(fs)
-    #print("Evaluating totally {} molecules".format(total_molecules))
+    total_molecules = len(fs)
+    print("Evaluating totally {} molecules".format(total_molecules))
     for f in fs:
         key = get_key(f)
         keys.append(key)
@@ -187,14 +184,12 @@ def bunch_eval(fs, epoch, decodings):
                 to_evaluate.append(mol)
                # evaluated_mols[key] = (np.array(ret_val), epoch)
             except:
-                od[key] = [False,-10]
-                evaluated_mols[key] = (np.asarray([False,-10]),epoch)
+                od[key] = [False] * 2
         i = i + 1
     print('New molecules for evaluation: {}'.format(len(to_evaluate)))
     if len(to_evaluate)!=0:
         Evaluations = bunch_evaluation(to_evaluate)
-        #print("Length of Evaluations {}".format(len(Evaluations)))
-        assert len(Evaluations) == len(to_evaluate)
+        print("Length of Evaluations {}".format(len(Evaluations)))
         for i in range(len(Evaluations)):
             for key in unused:
                 if od[key] == i:
