@@ -84,7 +84,7 @@ def modify_mols(X,decodings):
     stopped = np.zeros(BATCH_SIZE) != 0
     #loss = maximization()
     #get_custom_objects().update({"maximization": loss.computeloss})
-    actor = keras.models.load_model('./saved_models/generation', custom_objects={'maximization': maximization})
+    actor = keras.models.load_model('./saved_models/gen_org_mod_diff', custom_objects={'maximization': maximization})
     TIMES = 8
     for t in range(TIMES):
         #for each mol, a no. between 0-1 indicating the time-step
