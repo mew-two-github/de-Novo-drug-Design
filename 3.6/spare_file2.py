@@ -28,7 +28,9 @@ print(np.load('r_tot.npy'))
 import numpy as np
 import matplotlib.pyplot as plt
 hist = np.load('history/history.npy')
-print((hist[274]))
+print((np.argmax(hist[:,2])))
+print((hist[np.argmax(hist[:,2])]))
+'''
 import pandas as pd
 changes = pd.read_csv('./past outputs/5July/dist_exp_run/out_pIC'+str(1250)+'.csv')
 bins = np.linspace(4,10,14)
@@ -36,6 +38,7 @@ plt.hist(changes['Initial'], bins, alpha=0.5, label='initial',color='blue')
 plt.hist(changes['Modified'], bins, alpha=0.5, label='modified',color='green')
 plt.legend(loc='upper right')
 plt.show()
+'''
 '''
 plt.plot(range(len(hist)),hist)
 plt.show()
