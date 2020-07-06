@@ -144,7 +144,7 @@ def bunch_evaluation(mols):
 
         if SSSR[i] == True:    
             pIC = predictions[j]
-            val = math.exp(pIC-7)/const
+            val = pIC>7
 
             Evaluations.append([SSSR[i],val])
             j = j + 1
