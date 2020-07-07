@@ -15,7 +15,7 @@ def train(X, actor, critic, decodings, out_dir=None):
     hist = []
 # =============================================================================
     dist = get_init_dist(X, decodings)
-    np.save('./dist_classify_xgb_clean_good.npy',dist)
+    np.save('./dist_classify_xgb_clean_good_auto.npy',dist)
     logging.info("Printing initial distribution")
     print(dist)
 # =============================================================================

@@ -42,14 +42,16 @@ def main(fragment_file, lead_file):
     logging.info("Loaded encodings and decodings")
     
     X = encode_list(lead_mols, encodings)
-    print(X.shape)
+    #print(X.shape)
     if X.shape[0] == 0:
         return -1
     logging.info("Building models")
     actor, critic = build_models(X.shape[1:])
 
-    #X = clean_good(X, decodings)
-    #print(X.shape)
+    X = clean_good(X, decodings)
+
+    logging.info("Remaining molecules after clean good: %s",X.shape[0])
+
     if X.shape[0] == 0:
         return -1
     logging.info("Training")
@@ -64,7 +66,7 @@ def main(fragment_file, lead_file):
 if __name__ == "__main__":
 
     fragment_file = "Data/molecules.smi"
-    lead_file = "Data/AKT_pchembl_cleaned_good.csv"
+    lead_file = "Data/AKT_pchembl2.csv"
 
 
     if len(sys.argv) > 1:

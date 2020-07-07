@@ -119,7 +119,7 @@ def modify_mols(X,decodings):
 
                 batch_mol[i,a] = modify_fragment(batch_mol[i,a], s)#changes 0 to 1 and 1 to 0
             #Evaluating multiple molecules at the same time
-            e = 500
+            e = 1000
             np.save("./History/in-{}.npy".format(e), org_mols)
             np.save("./History/out-{}.npy".format(e), batch_mol)
 
@@ -147,7 +147,7 @@ def main(epoch,gen):
 
         X = encode_list(lead_mols, encodings)
         modify_mols(X,decodings)
-        epoch=500
+        epoch=1000
     file_name = './past outputs/out'+str(epoch)+'.csv'
     logging.info("Collecting and storing all molecules in {}".format(file_name))
     Show_Epoch.main(epoch,file_name)
