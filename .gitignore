@@ -3,4 +3,6 @@
 *.mol
 History/
 past outputs/
+3.6/Modules/spare_file.py
 Losses/
+.ipynb_checkpoints/
