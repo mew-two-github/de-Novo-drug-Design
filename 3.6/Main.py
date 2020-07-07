@@ -64,7 +64,7 @@ def main(fragment_file, lead_file):
 if __name__ == "__main__":
 
     fragment_file = "Data/molecules.smi"
-    lead_file = "Data/AKT_pchembl.csv"
+    lead_file = "Data/AKT_pchembl_cleaned_good.csv"
 
 
     if len(sys.argv) > 1:
