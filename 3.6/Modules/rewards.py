@@ -33,8 +33,9 @@ def modify_fragment(f, swap):
 
 # Discard molecules which fulfills all targets (used to remove to good lead molecules).
 def clean_good(X, decodings):
+    evals = bunch_eval(X,-1,decodings)
     X = [X[i] for i in range(X.shape[0]) if not
-        evaluate_mol(X[i], -1, decodings).all()]
+        evals[i].all()]
     return np.asarray(X)
 
 

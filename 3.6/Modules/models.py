@@ -4,7 +4,7 @@ from keras import initializers
 from keras import regularizers
 from keras import constraints
 from keras.layers import LSTMCell, LSTM, TimeDistributed, Dense, Input, Lambda, Dropout
-from keras.optimizers import Adam, SGD
+from keras.optimizers import Adam, SGD, Adadelta
 #from sklearn.metrics import roc_auc_score
 import numpy as np
 from keras import Model
@@ -48,7 +48,7 @@ def build_models(inp_shape):
 
     #takes molecules as inputs along with a 1-D array which has the time identity
     actor = Model([inp,inp2], out)
-    actor.compile(loss=maximization, optimizer=Adam(0.0005))
+    actor.compile(loss=maximization, optimizer=Adadelta(0.0005))
 
 
     # Build the critic
