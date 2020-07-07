@@ -1,3 +1,6 @@
 3.6/spare_file2.py
 .vscode/
 *.mol
+History/
+past outputs/
+Losses/
