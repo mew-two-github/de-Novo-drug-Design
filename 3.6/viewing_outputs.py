@@ -168,10 +168,13 @@ def main(epoch,gen):
     ini = np.asarray(ini)
     mod = np.asarray(mod)
     
-    changes = pd.DataFrame(np.transpose(np.asarray([ini,mod])),columns=['Modified','Initial'])
-    changes['Delta'] = changes['Modified'] - changes['Initial']
+    changes =  pd.DataFrame(np.transpose(np.asarray([ini,mod])),columns=['Initial_pIC','Modified_pIC'])
+    changes['Initial_mol'] = df.iloc[:,0]
+    changes['Modified_mol'] = df.iloc[:,1]
+    changes['Delta'] = changes['Modified_pIC'] - changes['Initial_pIC']
     changes.sort_values(by='Delta',ascending=False,inplace=True)
-    inact_to_act = changes.loc[(changes['Modified']>7) & (changes['Initial']<7),['Modified','Initial','Delta']].sort_values(by='Delta',ascending=False)
+
+    inact_to_act = changes.loc[(changes['Modified_pIC']>7) & (changes['Initial_pIC']<7),['Modified_pIC','Initial_pIC','Delta']].sort_values(by='Delta',ascending=False)
     
     changes.to_csv('./past outputs/out_pIC'+str(epoch)+'.csv',index=False)
     inact_to_act.to_csv('./past outputs/act_pIC'+str(epoch)+'.csv',index=False)
@@ -181,8 +184,8 @@ def main(epoch,gen):
 
     bins = np.linspace(4,10,14)
     #changes = changes.loc[changes.Delta>0]
-    plt.hist(changes['Initial'], bins, alpha=0.5, label='initial',color='blue')
-    plt.hist(changes['Modified'], bins, alpha=0.5, label='modified',color='green')
+    plt.hist(changes['Initial_pIC'], bins, alpha=0.5, label='initial',color='blue')
+    plt.hist(changes['Modified_pIC'], bins, alpha=0.5, label='modified',color='green')
     plt.legend(loc='upper right')
     plt.show()
 
