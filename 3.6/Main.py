@@ -48,7 +48,7 @@ def main(fragment_file, lead_file):
     logging.info("Building models")
     actor, critic = build_models(X.shape[1:])
 
-    X = clean_good(X, decodings)
+   # X = clean_good(X, decodings)
 
     logging.info("Remaining molecules after clean good: %s",X.shape[0])
 
@@ -58,7 +58,7 @@ def main(fragment_file, lead_file):
     history = train(X, actor, critic, decodings)
     logging.info("Saving")
     np.save("History/history.npy", history)
-    actor.save('./saved_models/generation')
+    actor.save('./saved_models/generation_exp_nactions')
     critic.save('./saved_models/critic')
 
 
@@ -66,7 +66,7 @@ def main(fragment_file, lead_file):
 if __name__ == "__main__":
 
     fragment_file = "Data/molecules.smi"
-    lead_file = "Data/AKT_pchembl2.csv"
+    lead_file = "Data/AKT_pchembl.csv"
 
 
     if len(sys.argv) > 1:

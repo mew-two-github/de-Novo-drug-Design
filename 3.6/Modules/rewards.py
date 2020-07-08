@@ -17,7 +17,7 @@ import math
 import xgboost as xgb
 
 #A scaling factor for reward
-const = math.exp(3)
+const = math.exp(2)
 
 
 
@@ -145,7 +145,7 @@ def bunch_evaluation(mols):
 
         if SSSR[i] == True:    
             pIC = predictions[j]
-            val = pIC>7
+            val = math.exp(pIC-7)/const
 
             Evaluations.append([SSSR[i],val])
             j = j + 1

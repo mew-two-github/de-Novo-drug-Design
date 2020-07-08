@@ -1,3 +1,23 @@
+from build_encoding import read_decodings, read_encodings
+encodings = read_encodings()
+decodings = read_decodings()
+i = 0
+from rdkit import Chem
+from rdkit.Chem import rdBase
+from rdkit.Chem import Draw
+from rdkit.Chem.Draw import IPythonConsole
+import matplotlib.pyplot as plt
+i = 0
+for code,mol in decodings.items() :
+    mols = []
+    if i==5:
+        break
+    mols.append(mol)
+    img = Draw.MolsToGridImage(mols)
+    print(code)
+    plt.imshow(img,cmap='RGB')
+    i += 1
+'''
 import numpy as np
 from global_parameters import MAX_SWAP, MAX_FRAGMENTS, GAMMA, BATCH_SIZE, EPOCHS, TIMES, FEATURES
 from rewards import get_init_dist, modify_fragment, bunch_eval
@@ -173,3 +193,4 @@ def train(X, actor, critic, decodings, out_dir=None):
         
 
     return hist
+'''

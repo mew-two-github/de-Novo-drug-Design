@@ -42,7 +42,7 @@ def build_models(inp_shape):
     inp2 = Input((1,))
     hidden = Concatenate()([hidden, hidden2, inp2])
 
-    #Reducing the number of cells(lol, forgot the exact term)
+    #Reducing the number of cells(forgot the exact term)
     hidden = LeakyReLU(0.1)(Dense(N_DENSE2, activation="linear")(hidden))
     out = Dense(n_actions, activation="softmax", activity_regularizer=l2(0.001))(hidden)
 
