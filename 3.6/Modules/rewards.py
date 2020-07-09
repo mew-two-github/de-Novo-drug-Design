@@ -145,7 +145,7 @@ def bunch_evaluation(mols):
 
         if SSSR[i] == True:    
             pIC = predictions[j]
-            val = math.exp(pIC-7)/const
+            val = pIC>7
 
             Evaluations.append([SSSR[i],val])
             j = j + 1
@@ -198,8 +198,8 @@ def bunch_eval(fs, epoch, decodings):
                     od[key] = value
                     evaluated_mols[key] = (np.array(value),epoch)
     ret_vals = []
-    with open('./ret_vals.pkl','wb') as f:
-        pickle.dump(ret_vals,f)
+    #with open('./ret_vals.pkl','wb') as f:
+     #   pickle.dump(ret_vals,f)
     for key in keys:
         ret_vals.append(np.asarray(od[key]))
     ret_vals = np.asarray(ret_vals)

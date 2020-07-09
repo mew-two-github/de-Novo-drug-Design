@@ -11,7 +11,7 @@ MAX_FRAGMENTS = 12
 ETA = 0.1
 
 # Generation parameters
-MAX_SWAP = 8
+MAX_SWAP = 5
 FEATURES = 2
 
 

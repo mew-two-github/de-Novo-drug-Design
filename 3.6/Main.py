@@ -49,8 +49,7 @@ def main(fragment_file, lead_file):
     actor, critic = build_models(X.shape[1:])
 
    # X = clean_good(X, decodings)
-
-    logging.info("Remaining molecules after clean good: %s",X.shape[0])
+   # logging.info("Remaining molecules after clean good: %s",X.shape[0])
 
     if X.shape[0] == 0:
         return -1
@@ -66,7 +65,7 @@ def main(fragment_file, lead_file):
 if __name__ == "__main__":
 
     fragment_file = "Data/molecules.smi"
-    lead_file = "Data/AKT_pchembl.csv"
+    lead_file = "Data/AKT_pchembl_cleaned_good.csv"
 
 
     if len(sys.argv) > 1:
