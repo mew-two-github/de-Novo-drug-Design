@@ -48,7 +48,7 @@ Any global parameters can be changed by changing them in the file "Modules/globa
 	8. training.py: Calculates the initial distribution and trains the actor and critic networks.
 	9. tree.py: Implements the tree class along with "btl": Build tree from list function
 
-##Short Description of non-code files:
+## Short Description of non-code files:
 1. Padel.txt: Contains the outputs of Padel file
 2. descriptors.csv: used to store the initial descriptors in this file
 3. uneval_desc.csv: in case, descriptors.csv contains NaN values, such rows are re-evaluated in uneval_desc.csv
