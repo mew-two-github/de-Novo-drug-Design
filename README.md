@@ -2,6 +2,7 @@
 Adopting the technique used in the paper: [Deep Reinforcement Learning for Multiparameter Optimization in
 de novo Drug Design](https://doi.org/10.26434/chemrxiv.7990910.v1) for optimising the pIC50 value of the molecules
 
+Outputs of some of the experiments are in the folder "past outputs"
 ## Instructions
 
 To run the main program on the same data as used in the best outputs (in folder "past outputs/7July/clean_good_manual/"):
