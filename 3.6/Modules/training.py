@@ -20,7 +20,7 @@ def train(X, actor, critic, decodings, out_dir=None):
     print(dist)
 # =============================================================================
 #    logging.info("dist.npy has been loaded")
-#    dist = np.load('./dist.npy')
+#    dist = np.load('./dist_npy_xgb_clean_good.npy')
 #    m = X.shape[1]
 
 

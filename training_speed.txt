@@ -1,1 +1,1 @@
-270 epochs in 1.5 hrs
+early implementation: 270 epochs in 1.5 hrs
