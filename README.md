@@ -23,7 +23,12 @@ New molecules can also be generated from a saved generation model. For this run:
 ```sh
 python viewing_outputs.py -gen 1
 ```
-Please note that I have NOT SAVED the best generation model. And also the this output IS NOT STOCHASTIC. 
+In the above run actions would be sampled from discrete distribution output by the actor(=> stochastic output)
+For performing the max probability action:
+```sh
+python viewing_outputs.py -gen 1 -stoch 0
+```
+Also, remember to change the appropriate file_path in the code. Please note that I have NOT SAVED the best generation model but an equivalent model is present and could very well be used.
 
 In either of the ways, the output is as follows:
 1. Displays two columns of molecules as PNG file. The first column contains the original lead molecule, while the second column contains modified molecules.

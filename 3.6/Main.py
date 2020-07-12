@@ -57,7 +57,7 @@ def main(fragment_file, lead_file):
     history = train(X, actor, critic, decodings)
     logging.info("Saving")
     np.save("History/history.npy", history)
-    actor.save('./saved_models/generation_exp_nactions')
+    actor.save('./saved_models/generation')
     critic.save('./saved_models/critic')
 
 

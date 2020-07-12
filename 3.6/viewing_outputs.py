@@ -76,7 +76,7 @@ def get_pIC50(mols):
     print('Properties predicted for {} molecules'.format(len(predictions)))
     return predictions
 
-def modify_mols(X,decodings):
+def modify_mols(X,decodings,stoch=1):
     batch_mol = X.copy()
     org_mols = batch_mol.copy() #saving a copy of the original molecules
     BATCH_SIZE = len(X)
@@ -86,18 +86,29 @@ def modify_mols(X,decodings):
     #get_custom_objects().update({"maximization": loss.computeloss})
     actor = keras.models.load_model('./saved_models/generation', custom_objects={'maximization': maximization})
     TIMES = 8
+    rand_select = np.random.rand(BATCH_SIZE)
     for t in range(TIMES):
         #for each mol, a no. between 0-1 indicating the time-step
         tm = (np.ones((BATCH_SIZE,1)) * t) / TIMES
         #predictions for all the 512 molecules: 512*n_actions
         probs = actor.predict([batch_mol, tm])
         actions = np.zeros((BATCH_SIZE))
-        old_batch = batch_mol.copy()
-        rewards = np.zeros((BATCH_SIZE,1))
+        if stoch == 1:
         # Find probabilities for modification actions
-        for i in range(BATCH_SIZE):#for every molecules in the batch
-            #choose the action which has maximum probability
-            actions[i]=np.argmax(probs[i])
+            for i in range(BATCH_SIZE):#for every molecules in the batch
+
+                    a = 0
+                    while True:
+                        rand_select[i] -= probs[i,a]
+                        if rand_select[i] < 0 or a + 1 == n_actions:
+                            break
+                        a += 1
+                    #choosing a random action
+                    actions[i] = a
+        else:
+            for i in range(BATCH_SIZE):#for every molecules in the batch
+                #choose the action which has maximum probability
+                actions[i]=np.argmax(probs[i])
     
         # Select actions
         for i in range(BATCH_SIZE):
@@ -105,8 +116,6 @@ def modify_mols(X,decodings):
             a = int(actions[i])
             if stopped[i] or a == n_actions - 1:
                 stopped[i] = True
-                if t == 0:
-                    rewards[i] += -1. #Why?
                 continue
 
             #Converting the n_actions*1 position to the actual position    
@@ -200,11 +209,13 @@ def main(epoch,gen):
 parser = argparse.ArgumentParser()
 parser.add_argument("-epoch", dest="epoch", help="Epoch for which the results are to be viewed", default=0)
 parser.add_argument("-gen",dest="gen",help="Pass as 1 if you want to generate new molecules",default=0)
+parser.add_argument("-stoch",dest="stoch",help="Pass as 0 if you do not want to generate new molecules by sampling actions from a probability distribution",default=1)
 if __name__ == "__main__":
 
     args = parser.parse_args()
     epoch = int(args.epoch)
     gen = int(args.gen)
+    stoch = int(args.stoch)
     main(int(args.epoch),int(gen))
 
 
