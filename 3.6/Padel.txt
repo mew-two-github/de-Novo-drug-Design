@@ -25305,3 +25305,93 @@ Processing 997 in 997.mol (1260/1262). Average speed: 0.29 s/mol.
 Processing 998 in 998.mol (1261/1262). Average speed: 0.29 s/mol.
 Processing 999 in 999.mol (1262/1262). Average speed: 0.29 s/mol.
 Descriptor calculation completed in 6 mins 9.168 secs . Average speed: 0.29 s/mol.
+Processing 0 in 0.mol (1/4). 
+Processing 1 in 1.mol (2/4). 
+Processing 2 in 2.mol (3/4). 
+Processing 3 in 3.mol (4/4). 
+Descriptor calculation completed in 1.178 secs . Average speed: 0.29 s/mol.
+Processing 0 in 0.mol (1/4). 
+Processing 1 in 1.mol (2/4). 
+Processing 2 in 2.mol (3/4). 
+Processing 3 in 3.mol (4/4). 
+Descriptor calculation completed in 2.140 secs . Average speed: 0.54 s/mol.
+Processing 0 in 0.mol (1/6). 
+Processing 1 in 1.mol (2/6). 
+Processing 2 in 2.mol (3/6). 
+Processing 3 in 3.mol (4/6). 
+Processing 4 in 4.mol (5/6). 
+Processing 5 in 5.mol (6/6). 
+Descriptor calculation completed in 2.976 secs . Average speed: 0.50 s/mol.
+Processing 0 in 0.mol (1/6). 
+Processing 1 in 1.mol (2/6). 
+Processing 2 in 2.mol (3/6). 
+Processing 3 in 3.mol (4/6). 
+Processing 4 in 4.mol (5/6). 
+Processing 5 in 5.mol (6/6). 
+Descriptor calculation completed in 1.814 secs . Average speed: 0.30 s/mol.
+Processing 0 in 0.mol (1/7). 
+Processing 1 in 1.mol (2/7). 
+Processing 2 in 2.mol (3/7). 
+Processing 3 in 3.mol (4/7). 
+Processing 4 in 4.mol (5/7). 
+Processing 5 in 5.mol (6/7). 
+Processing 6 in 6.mol (7/7). 
+Descriptor calculation completed in 2.977 secs . Average speed: 0.43 s/mol.
+Processing 0 in 0.mol (1/7). 
+Processing 1 in 1.mol (2/7). 
+Processing 2 in 2.mol (3/7). 
+Processing 3 in 3.mol (4/7). 
+Processing 4 in 4.mol (5/7). 
+Processing 5 in 5.mol (6/7). 
+Processing 6 in 6.mol (7/7). 
+Descriptor calculation completed in 1.724 secs . Average speed: 0.25 s/mol.
+Processing 0 in 0.mol (1/8). 
+Processing 1 in 1.mol (2/8). 
+Processing 2 in 2.mol (3/8). 
+Processing 3 in 3.mol (4/8). 
+Processing 4 in 4.mol (5/8). 
+Processing 5 in 5.mol (6/8). 
+Processing 6 in 6.mol (7/8). 
+Processing 7 in 7.mol (8/8). 
+Descriptor calculation completed in 3.222 secs . Average speed: 0.40 s/mol.
+Processing 0 in 0.mol (1/8). 
+Processing 2 in 2.mol (3/8). 
+Processing 1 in 1.mol (2/8). 
+Processing 3 in 3.mol (4/8). 
+Processing 4 in 4.mol (5/8). 
+Processing 5 in 5.mol (6/8). 
+Processing 6 in 6.mol (7/8). 
+Processing 7 in 7.mol (8/8). 
+Descriptor calculation completed in 1.974 secs . Average speed: 0.25 s/mol.
+Processing 0 in 0.mol (1/8). 
+Processing 1 in 1.mol (2/8). 
+Processing 2 in 2.mol (3/8). 
+Processing 3 in 3.mol (4/8). 
+Processing 4 in 4.mol (5/8). 
+Processing 5 in 5.mol (6/8). 
+Processing 6 in 6.mol (7/8). 
+Processing 7 in 7.mol (8/8). 
+Descriptor calculation completed in 1.869 secs . Average speed: 0.23 s/mol.
+Processing 0 in 0.mol (1/8). 
+Processing 1 in 1.mol (2/8). 
+Processing 2 in 2.mol (3/8). 
+Processing 3 in 3.mol (4/8). 
+Processing 4 in 4.mol (5/8). 
+Processing 5 in 5.mol (6/8). 
+Processing 6 in 6.mol (7/8). 
+Processing 7 in 7.mol (8/8). 
+Descriptor calculation completed in 2.859 secs . Average speed: 0.36 s/mol.
+Processing 0 in 0.mol (1/6). 
+Processing 1 in 1.mol (2/6). 
+Processing 2 in 2.mol (3/6). 
+Processing 3 in 3.mol (4/6). 
+Processing 4 in 4.mol (5/6). 
+Processing 5 in 5.mol (6/6). 
+Descriptor calculation completed in 1.574 secs . Average speed: 0.26 s/mol.
+Processing 0 in 0.mol (1/6). 
+Processing 1 in 1.mol (2/6). 
+Processing 2 in 2.mol (3/6). 
+Processing 3 in 3.mol (4/6). 
+Processing 4 in 4.mol (5/6). 
+Processing 5 in 5.mol (6/6). 
+Descriptor calculation completed in 1.501 secs . Average speed: 0.25 s/mol.

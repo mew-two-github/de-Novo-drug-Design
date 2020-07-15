@@ -134,7 +134,7 @@ def modify_mols(X,decodings,stoch=1):
 
 def main(epoch,gen):
     if gen == 1:
-        lead_file = "Data/AKT_pchembl.csv"
+        lead_file = "Data/trial.csv"
         fragment_file = "Data/molecules.smi"
         fragment_mols = read_file(fragment_file)
         lead_mols = read_file(lead_file)
