@@ -6,6 +6,7 @@ import pandas as pd
 from rdkit import Chem
 from mol_utils import get_fragments
 import numpy as np
+import time
 import sys
 import matplotlib.pyplot as plt
 import pickle
@@ -134,7 +135,7 @@ def modify_mols(X,decodings,stoch=1):
 
 def main(epoch,gen):
     if gen == 1:
-        lead_file = "Data/trial.csv"
+        lead_file = "Data/AKT_pchembl2.csv"
         fragment_file = "Data/molecules.smi"
         fragment_mols = read_file(fragment_file)
         lead_mols = read_file(lead_file)
@@ -216,6 +217,8 @@ if __name__ == "__main__":
     epoch = int(args.epoch)
     gen = int(args.gen)
     stoch = int(args.stoch)
+    start_time = time.time()
     main(int(args.epoch),int(gen))
+    print("---Time taken = {} seconds ---".format(time.time() - start_time))
 
 
