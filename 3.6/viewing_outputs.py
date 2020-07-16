@@ -135,7 +135,7 @@ def modify_mols(X,decodings,stoch=1):
 
 def main(epoch,gen):
     if gen == 1:
-        lead_file = "Data/AKT_pchembl2.csv"
+        lead_file = "Data/trial.csv"
         fragment_file = "Data/molecules.smi"
         fragment_mols = read_file(fragment_file)
         lead_mols = read_file(lead_file)
@@ -191,7 +191,15 @@ def main(epoch,gen):
     
     print(inact_to_act.head())
     print(changes.head())
-
+    from rdkit.Chem import Draw
+    moli = []
+    molm = []
+    for i in range(5):
+        moli.append(Chem.MolFromSmiles(changes.iloc[i,2]))
+        moli.append(Chem.MolFromSmiles(changes.iloc[i,3]))
+    plot = Draw.MolsToGridImage(moli, molsPerRow=2)
+    plot.show()
+    #plot.save('/past outputs/epoch.png')
     bins = np.linspace(4,10,14)
     #changes = changes.loc[changes.Delta>0]
     plt.hist(changes['Initial_pIC'], bins, alpha=0.5, label='initial',color='blue')

@@ -16,3 +16,5 @@ CN(C)C1CCN(Cc2cc3nc(-n4cnc5ccccc54)nc(N4CCOCC4)c3s2)CC1,6.01
 O=C(CCc1ccccc1)Nc1ccc(-c2nnc3n2-c2cccnc2Nc2ccccc2-3)cc1,5.75
 O=S(=O)(NC1CCN(Cc2ccc(-c3nnc4n3-c3cccnc3Nc3ccccc3-4)cc2)CC1)c1cccc(F)c1,5.57
 [C-]#[N+]C1(c2ccccc2)CCN(Cc2ccc(-c3nnc4n3-c3cccnc3Nc3ccccc3-4)cc2)CC1,5.14
+NC(=O)c1ccc(NCCc2ccccc2)c2cncnc12,5.25
+Nc1cc(C(F)F)c(-c2nc(N3C[C@@H]4C[C@H]3CO4)nc(N3C[C@@H]4C[C@H]3CO4)n2)cn1,5.39
