@@ -65,7 +65,7 @@ def get_pIC50(mols):
         unevalmol.drop(columns=bad,inplace=True)
         print(unevalmol.isna().sum(axis=1))
         xg_all = pd.concat([xg_all,unevalmol])
-    xg_all.to_csv('./xgall.csv')
+    #xg_all.to_csv('./xgall.csv')
     xg_all.fillna(value=0,inplace=True)
     regressor = xgb.XGBRegressor()
     regressor.load_model('./saved_models/best_from_gs38.model')
